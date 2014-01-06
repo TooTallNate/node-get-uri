@@ -31,7 +31,7 @@ getUri('file:///Users/nrajlich/wat.json').pipe(process.stdout);
 API
 ---
 
-### getUri(String uri) → stream.Readable
+### getUri(String uri[, Object options]) → stream.Readable
 
 
 
