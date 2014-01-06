@@ -1,4 +1,3 @@
-
 /**
  * Module dependencies.
  */
@@ -19,8 +18,7 @@ function get (parsed, opts) {
 
 	//verify path with thrown err
 	fs.stat(parsed.path,function(err){
-		console.log('that file path was wrong',err)
-		if(err) throw err;
+		throw new TypeError('that file path was wrong: '+err);
 	})
 
 	if (typeof arguments[1] != 'object'){
