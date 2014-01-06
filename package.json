@@ -1,0 +1,39 @@
+{
+  "name": "get-uri",
+  "version": "0.0.0",
+  "description": "Returns a ReadStream from a URI string",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TooTallNate/node-get-uri.git"
+  },
+  "keywords": [
+    "uri",
+    "read",
+    "readstream",
+    "stream",
+    "get",
+    "http",
+    "https",
+    "ftp",
+    "file",
+    "data",
+    "protocol",
+    "url"
+  ],
+  "author": "Nathan Rajlich <nathan@tootallnate.net> (http://n8.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TooTallNate/node-get-uri/issues"
+  },
+  "devDependencies": {
+    "mocha": "~1.16.2"
+  },
+  "dependencies": {
+    "data-uri-to-buffer": "0.0.1",
+    "ftp": "~0.3.5"
+  }
+}
