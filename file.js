@@ -18,7 +18,10 @@ function get (parsed, opts) {
 
 	//verify path with thrown err
 	fs.stat(parsed.path,function(err){
-		throw new TypeError('that file path was wrong: '+err);
+		 if(err) {
+		 	console.log('incorrect file path')
+		 	throw err;
+		 }
 	})
 
 	if (typeof arguments[1] != 'object'){
@@ -26,10 +29,8 @@ function get (parsed, opts) {
 	} else {
 
 		if(Object.keys(opts).length < 1){
-			//thanks for nothing
 			return fs.createReadStream(arguments[0].path)
 		} else {
-			//and we're ready to pipe
 			return fs.createReadStream(arguments[0].path,opts)
 		}
 
