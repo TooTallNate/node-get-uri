@@ -52,4 +52,21 @@ describe('get-uri', function () {
 
   });
 
+  describe('"ftp:" protocol', function () {
+
+    it('should work for ftp endpoints', function (done) {
+      var uri = 'ftp://ftp.kernel.org/pub/site/README';
+      getUri(uri, function (err, rs) {
+        if (err) return done(err);
+        streamToArray(rs, function (err, array) {
+          if (err) return done(err);
+          var buf = Buffer.concat(array);
+          assert(buf.length > 0);
+          done();
+        });
+      });
+    });
+
+  });
+
 });
