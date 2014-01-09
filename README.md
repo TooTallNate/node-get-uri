@@ -24,7 +24,10 @@ Example
 var getUri = require('get-uri');
 
 // maps to a `fs.ReadStream` instance
-getUri('file:///Users/nrajlich/wat.json').pipe(process.stdout);
+getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
+  if (err) throw err;
+  rs.pipe(process.stdout);
+});
 ```
 
 
