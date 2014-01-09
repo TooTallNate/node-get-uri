@@ -28,7 +28,7 @@ function get (parsed, opts, fn) {
   }
 
   function onfile (err, stream) {
-    if (err) return passthrough.emit('error', err);
+    if (err) return fn(err);
     stream.once('end', onend);
     fn(null, stream);
   }
