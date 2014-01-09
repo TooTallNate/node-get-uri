@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "mocha": "~1.16.2",
-    "suckstream": "~0.1.1"
+    "stream-to-array": "~1.0.0"
   },
   "dependencies": {
     "data-uri-to-buffer": "0.0.3",

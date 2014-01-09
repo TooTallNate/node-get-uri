@@ -5,7 +5,7 @@
 
 var getUri = require('../');
 var assert = require('assert');
-var toBuffer = require('suckstream');
+var streamToArray = require('stream-to-array');
 
 describe('get-uri', function () {
 
@@ -29,8 +29,9 @@ describe('get-uri', function () {
     it('should work for URL-encoded data', function (done) {
       getUri('data:,Hello%2C%20World!', function (err, rs) {
         if (err) return done(err);
-        toBuffer(rs, function (err, buf) {
+        streamToArray(rs, function (err, array) {
           if (err) return done(err);
+          var buf = Buffer.concat(array);
           assert.equal('Hello, World!', buf.toString());
           done();
         });
@@ -40,8 +41,9 @@ describe('get-uri', function () {
     it('should work for base64-encoded data', function (done) {
       getUri('data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D', function (err, rs) {
         if (err) return done(err);
-        toBuffer(rs, function (err, buf) {
+        streamToArray(rs, function (err, array) {
           if (err) return done(err);
+          var buf = Buffer.concat(array);
           assert.equal('Hello, World!', buf.toString());
           done();
         });
