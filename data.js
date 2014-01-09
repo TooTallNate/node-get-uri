@@ -18,12 +18,12 @@ module.exports = get;
  * @api protected
  */
 
-function get (parsed, opts) {
+function get (parsed, opts, fn) {
   var uri = parsed.href;
   var buf = dataUriToBuffer(uri, opts);
   var rs = new Readable();
   rs._read = read(buf);
-  return rs;
+  fn(null, rs);
 }
 
 /**
