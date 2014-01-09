@@ -4,6 +4,9 @@
  */
 
 var FTP = require('ftp');
+var path = require('path');
+var NotModifiedError = require('./notmodified');
+var debug = require('debug')('get-uri:ftp');
 
 /**
  * Module exports.
@@ -18,28 +21,99 @@ module.exports = get;
  */
 
 function get (parsed, opts, fn) {
+  var cache = opts.cache;
   var client = new FTP();
   var filepath = parsed.pathname;
+  var lastModified;
 
-  client.on('ready', onready);
+  client.once('ready', onready);
+  client.once('greeting', ongreeting);
 
   function onready () {
-    client.get(filepath, onfile);
+    // first we have to figure out the Last Modified date.
+    // try the MDTM command first, which is an optional extension command.
+    client.lastMod(filepath, onlastmod);
+  }
+
+  function ongreeting (greeting) {
+    debug('FTP greeting: "%s"', greeting);
+  }
+
+  function onerror (err) {
+    client.end();
+    fn(err);
   }
 
   function onfile (err, stream) {
-    if (err) return fn(err);
+    if (err) return onerror(err);
     stream.once('end', onend);
+    stream.lastModified = lastModified;
     fn(null, stream);
   }
 
   function onend () {
-    //console.error('stream "end" event');
+    // close the FTP client socket connection
     client.end();
+  }
+
+  function getFile () {
+    client.get(filepath, onfile);
+  }
+
+  function onlastmod (err, lastmod) {
+    // ignore `err`, since the MDTM command is optional
+    // TODO: handle the "file not found" scenario though...
+    if (lastmod) {
+      setLastMod(lastmod);
+    } else {
+      // try to get the last modified date via the LIST command (uses
+      // more bandwidth, but is more compatible with older FTP servers
+      var dir = path.dirname(filepath);
+      client.list(dir, onlist);
+    }
+  }
+
+  function setLastMod (lastmod) {
+    lastModified = lastmod;
+    if (cache && isNotModified()) {
+      // file is the same as in the "cache", return a not modified error
+      onerror(new NotModifiedError());
+    } else {
+      // XXX: a small timeout seemed necessary otherwise FTP servers
+      // were returning empty sockets for the file occasionally
+      setTimeout(client.get.bind(client, filepath, onfile), 10);
+    }
+  }
+
+  function onlist (err, list) {
+    if (err) return onerror(err);
+    var name = path.basename(filepath);
+
+    // attempt to find the "entry" with a matching "name"
+    var entry;
+    for (var i = 0; i < list.length; i++) {
+      entry = list[i];
+      if (entry.name == name) {
+        break;
+      }
+      entry = null;
+    }
+
+    if (entry) {
+      setLastMod(entry.date);
+    } else {
+      // TODO: return an ENOTFOUND error for file not found
+    }
+  }
+
+  // called when `lastModified` is set, and a "cache" stream was provided
+  function isNotModified () {
+    return +cache.lastModified == +lastModified;
   }
 
   opts.host = parsed.hostname || parsed.host || 'localhost';
   opts.port = parseInt(parsed.port, 10) || 21;
+  if (debug.enabled) opts.debug = debug;
   // TODO: add auth
   client.connect(opts);
 }
