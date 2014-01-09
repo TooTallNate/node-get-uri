@@ -30,7 +30,8 @@
     "url": "https://github.com/TooTallNate/node-get-uri/issues"
   },
   "devDependencies": {
-    "mocha": "~1.16.2"
+    "mocha": "~1.16.2",
+    "suckstream": "~0.1.1"
   },
   "dependencies": {
     "data-uri-to-buffer": "0.0.1",
