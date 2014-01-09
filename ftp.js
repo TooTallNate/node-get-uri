@@ -34,7 +34,7 @@ function get (parsed, opts, fn) {
   }
 
   function onend () {
-    console.error('stream "end" event');
+    //console.error('stream "end" event');
     client.end();
   }
 
