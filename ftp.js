@@ -3,7 +3,6 @@
  * Module dependencies.
  */
 
-var PassThrough = require('stream').PassThrough;
 var FTP = require('ftp');
 
 /**
@@ -18,10 +17,9 @@ module.exports = get;
  * @api protected
  */
 
-function get (parsed, opts) {
+function get (parsed, opts, fn) {
   var client = new FTP();
   var filepath = parsed.pathname;
-  var passthrough = new PassThrough();
 
   client.on('ready', onready);
 
@@ -32,7 +30,7 @@ function get (parsed, opts) {
   function onfile (err, stream) {
     if (err) return passthrough.emit('error', err);
     stream.once('end', onend);
-    stream.pipe(passthrough);
+    fn(null, stream);
   }
 
   function onend () {
@@ -44,6 +42,4 @@ function get (parsed, opts) {
   opts.port = parseInt(parsed.port, 10) || 21;
   // TODO: add auth
   client.connect(opts);
-
-  return passthrough;
 }
