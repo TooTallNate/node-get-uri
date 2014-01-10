@@ -12,7 +12,7 @@ var inherits = require('util').inherits;
 module.exports = NotFoundError;
 
 /**
- * Error subclass to use when the source has not been modified.
+ * Error subclass to use when the source does not exist at the specified endpoint.
  *
  * @param {String} message optional "message" property to set
  * @api protected
