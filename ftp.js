@@ -5,6 +5,7 @@
 
 var FTP = require('ftp');
 var path = require('path');
+var NotFoundError = require('./notfound');
 var NotModifiedError = require('./notmodified');
 var debug = require('debug')('get-uri:ftp');
 
@@ -61,8 +62,13 @@ function get (parsed, opts, fn) {
   }
 
   function onlastmod (err, lastmod) {
-    // ignore `err`, since the MDTM command is optional
-    // TODO: handle the "file not found" scenario though...
+    // handle the "file not found" error code
+    if (err) {
+      if (550 == err.code) {
+        onerror(new NotFoundError());
+      }
+      // any other error then we'll try the LIST command instead
+    }
     if (lastmod) {
       setLastMod(lastmod);
     } else {
@@ -102,7 +108,7 @@ function get (parsed, opts, fn) {
     if (entry) {
       setLastMod(entry.date);
     } else {
-      // TODO: return an ENOTFOUND error for file not found
+      onerror(new NotFoundError());
     }
   }
 
@@ -114,6 +120,7 @@ function get (parsed, opts, fn) {
   opts.host = parsed.hostname || parsed.host || 'localhost';
   opts.port = parseInt(parsed.port, 10) || 21;
   if (debug.enabled) opts.debug = debug;
+
   // TODO: add auth
   client.connect(opts);
 }
