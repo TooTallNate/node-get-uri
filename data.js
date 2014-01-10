@@ -7,7 +7,7 @@ var crypto = require('crypto');
 var Readable = require('stream').Readable;
 var dataUriToBuffer = require('data-uri-to-buffer');
 var NotModifiedError = require('./notmodified');
-var debug = require('debug')('get-uri:ftp');
+var debug = require('debug')('get-uri:data');
 
 /**
  * Module exports.
