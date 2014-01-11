@@ -22,7 +22,7 @@ function get (parsed, opts, fn) {
   
   fs.stat(filepath, function (err){
     if(err) {
-      throw new NotFoundError('incorrect file path:\n\n'+filepath+'\n');
+      throw new NotFoundError('file does not exist at the path specified:\n\n'+filepath+'\n');
     }
   })
 
