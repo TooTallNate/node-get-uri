@@ -48,6 +48,15 @@ When the `"ENOTMODIFIED"` error occurs, then you can safely re-use the
 results from the previous `getUri()` call for that same URI.
 
 
+Missing Endpoints
+-----------------
+
+When you pass in a URI in which the resource referenced does not exist on the
+destination server, then a `NotFoundError` will be returned. The `code` of the
+error instance is set to `"ENOTFOUND"`, so you can special-case that in your code
+to detect when a bad filename is requested.
+
+
 API
 ---
 
