@@ -2,7 +2,9 @@
  * Module dependencies.
  */
 
-var fs = require('fs')
+var fs = require('fs');
+var path = require('path');
+var NotFoundError = require('./notfound');
 
 /**
  * Module exports.
@@ -11,28 +13,25 @@ var fs = require('fs')
 module.exports = get;
 
 /**
- * 
+ * Returns a Readable stream from a "file system" URI.
  */
 
-function get (parsed, opts) {
+function get (parsed, opts, fn) {
 
-	//verify path with thrown err
-	fs.stat(parsed.path,function(err){
-		 if(err) {
-		 	console.log('incorrect file path')
-		 	throw err;
-		 }
-	})
+  var filepath = path.normalize(parsed.pathname);
+  
+  fs.stat(filepath, function (err){
+    if(err) {
+      throw new NotFoundError('incorrect file path:\n\n'+filepath+'\n');
+    }
+  })
 
-	if (typeof arguments[1] != 'object'){
-		throw new TypeError('pass an object instead of: '+opts);
-	} else {
+  if (typeof opts == 'string'){
+    // as a shorthand option, pass a string to the file API
+    // a string in leiu of the options object sets encoding
+    var opts = {encoding:opts}
+  }
 
-		if(Object.keys(opts).length < 1){
-			return fs.createReadStream(arguments[0].path)
-		} else {
-			return fs.createReadStream(arguments[0].path,opts)
-		}
+  return fn(null, fs.createReadStream(filepath,opts))
 
-	}
 }
