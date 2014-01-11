@@ -46,8 +46,9 @@ getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
   rs.pipe(process.stdout);
 
   // ... some time later, we need to get this same URI again, pass in the
-  // previous `stream.Readable` instance to get possible "ENOTMODIFIED" responses:
-  getUri('file:///Users/nrajlich/wat.json', function (err, rs2) {
+  // previous `stream.Readable` instance as `cache` option to potentially
+  // receive "ENOTMODIFIED" responses:
+  getUri('file:///Users/nrajlich/wat.json', { cache: rs }, function (err, rs2) {
     if (err) {
       if ('ENOTFOUND' == err.code) {
         // bad file path requested
