@@ -5,7 +5,16 @@ get-uri
 
 This high-level module accepts a URI string and returns a `Readable` stream
 instance. There is built-in support for a variety of "protocols", and it's
-easily extensible with more.
+easily extensible with more:
+
+| Protocol  | Description                     | Example
+|:---------:|:-------------------------------:|:---------------------------------:
+| `data`    | [Data URIs][data]               | `data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D`
+| `file`    | [File URIs][file]               | `file:///c:/windows/example.ini`
+| `ftp`     | [FTP URIs][ftp]                 | `ftp://ftp.kernel.org/pub/site/README`
+| `http`    | [HTTP URIs][http]               | `http://www.example.com/path/to/name`
+| `https`   | [HTTPS URIs][https]             | `https://www.example.com/path/to/name`
+
 
 Installation
 ------------
@@ -24,8 +33,37 @@ Example
 var getUri = require('get-uri');
 
 // maps to a `fs.ReadStream` instance
-getUri('file:///Users/nrajlich/wat.json').pipe(process.stdout);
+getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
+  if (err) throw err;
+  rs.pipe(process.stdout);
+});
 ```
+
+
+Cacheability
+------------
+
+When calling `getUri()` with the same URI multiple times, the `get-uri` module
+supports sending an indicator that the remote resource has not been modified
+since the last time it has been retreived from that node process.
+
+To do this, pass in a `cache` option to the "options object" argument
+with the value set to the `stream.Readable` instance that was previously
+returned. If the remote resource has not been changed since the last call for
+that same URI, then a `NotModifiedError` instance will be returned with it's
+`code` property set to `"ENOTMODIFIED"`.
+
+When the `"ENOTMODIFIED"` error occurs, then you can safely re-use the
+results from the previous `getUri()` call for that same URI.
+
+
+Missing Endpoints
+-----------------
+
+When you pass in a URI in which the resource referenced does not exist on the
+destination server, then a `NotFoundError` will be returned. The `code` of the
+error instance is set to `"ENOTFOUND"`, so you can special-case that in your code
+to detect when a bad filename is requested.
 
 
 API
@@ -33,7 +71,13 @@ API
 
 ### getUri(String uri[, Object options]) → stream.Readable
 
+A `uri` String is required. An optional `options` object may be passed in:
 
+ - `cache` - A `stream.Readable` instance from a previous call to `getUri()` with the same URI. If this option is passed in, and the destination endpoint has not been modified, then an `ENOTMODIFIED` error is returned
+
+Any other options passed in to the `options` object will be passed through
+to the low-level connection creation functions (`http.get()`, `ftp.connect()`,
+etc).
 
 License
 -------
@@ -60,3 +104,9 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[data]: http://tools.ietf.org/html/rfc2397
+[file]: http://tools.ietf.org/html/draft-hoffman-file-uri-03
+[ftp]: http://www.w3.org/Protocols/rfc959/
+[http]: http://www.w3.org/Protocols/rfc2616/rfc2616.html
+[https]: http://wikipedia.org/wiki/HTTP_Secure
