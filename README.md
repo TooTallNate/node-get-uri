@@ -5,7 +5,16 @@ get-uri
 
 This high-level module accepts a URI string and returns a `Readable` stream
 instance. There is built-in support for a variety of "protocols", and it's
-easily extensible with more.
+easily extensible with more:
+
+| Protocol  | Description                     | Example
+|:---------:|:-------------------------------:|:---------------------------------:
+| `data`    | [Data URIs][data]               | `data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D`
+| `file`    | [File URIs][file]               | `file:///c:/windows/example.ini`
+| `ftp`     | [FTP URIs][ftp]                 | `ftp://ftp.kernel.org/pub/site/README`
+| `http`    | [HTTP URIs][http]               | `http://www.example.com/path/to/name`
+| `https`   | [HTTPS URIs][http]              | `https://www.example.com/path/to/name`
+
 
 Installation
 ------------
@@ -95,3 +104,9 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[data]: http://tools.ietf.org/html/rfc2397
+[file]: http://tools.ietf.org/html/draft-hoffman-file-uri-03
+[ftp]: http://www.w3.org/Protocols/rfc959/
+[http]: http://www.w3.org/Protocols/rfc2616/rfc2616.html
+[https]: http://wikipedia.org/wiki/HTTP_Secure
