@@ -13,7 +13,7 @@ easily extensible with more:
 | `file`    | [File URIs][file]               | `file:///c:/windows/example.ini`
 | `ftp`     | [FTP URIs][ftp]                 | `ftp://ftp.kernel.org/pub/site/README`
 | `http`    | [HTTP URIs][http]               | `http://www.example.com/path/to/name`
-| `https`   | [HTTPS URIs][http]              | `https://www.example.com/path/to/name`
+| `https`   | [HTTPS URIs][https]             | `https://www.example.com/path/to/name`
 
 
 Installation
