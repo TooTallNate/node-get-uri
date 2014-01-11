@@ -16,7 +16,7 @@ var debug = require('debug')('get-uri:ftp');
 module.exports = get;
 
 /**
- * Returns a Readable stream from a "ftp:" URI.
+ * Returns a Readable stream from an "ftp:" URI.
  *
  * @api protected
  */
