@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+var fs = require('fs');
 var getUri = require('../');
 var assert = require('assert');
 var streamToArray = require('stream-to-array');
@@ -46,6 +47,26 @@ describe('get-uri', function () {
           var buf = Buffer.concat(array);
           assert.equal('Hello, World!', buf.toString());
           done();
+        });
+      });
+    });
+
+  });
+
+  describe('"file:" protocol', function () {
+
+    it('should work for local files', function (done) {
+      var uri = 'file://' + __filename;
+      fs.readFile(__filename, 'utf8', function (err, real) {
+        if (err) return done(err);
+        getUri(uri, function (err, rs) {
+          if (err) return done(err);
+          streamToArray(rs, function (err, array) {
+            if (err) return done(err);
+            var str = Buffer.concat(array).toString('utf8');
+            assert.equal(str, real);
+            done();
+          });
         });
       });
     });
