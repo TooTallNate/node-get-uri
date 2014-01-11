@@ -31,12 +31,35 @@ getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
 ```
 
 
+Cacheability
+------------
+
+When calling `getUri()` with the same URI multiple times, the `get-uri` module
+supports sending an indicator that the remote resource has not been modified
+since the last time it has been retreived from that node process.
+
+To do this, pass in a `cache` option to the "options object" argument
+with the value set to the `stream.Readable` instance that was previously
+returned. If the remote resource has not been changed since the last call for
+that same URI, then a `NotModifiedError` instance will be returned with it's
+`code` property set to `"ENOTMODIFIED"`.
+
+When the `"ENOTMODIFIED"` error occurs, then you can safely re-use the
+results from the previous `getUri()` call for that same URI.
+
+
 API
 ---
 
 ### getUri(String uri[, Object options]) → stream.Readable
 
+A `uri` String is required. An optional `options` object may be passed in:
 
+ - `cache` - A `stream.Readable` instance from a previous call to `getUri()` with the same URI. If this option is passed in, and the destination endpoint has not been modified, then an `ENOTMODIFIED` error is returned
+
+Any other options passed in to the `options` object will be passed through
+to the low-level connection creation functions (`http.get()`, `ftp.connect()`,
+etc).
 
 License
 -------
