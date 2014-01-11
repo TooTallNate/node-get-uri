@@ -23,7 +23,7 @@ module.exports = get;
 
 function get (parsed, opts, fn) {
 
-  var filepath = path.normalize(parsed.pathname);
+  var filepath = path.normalize(decodeURIComponent(parsed.pathname));
   debug('normalized pathname: %j', filepath);
 
   fs.stat(filepath, function (err){
