@@ -1,7 +1,7 @@
 {
   "name": "get-uri",
   "version": "0.0.0",
-  "description": "Returns a ReadStream from a URI string",
+  "description": "Returns a `stream.Readable` from a URI string",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec"
