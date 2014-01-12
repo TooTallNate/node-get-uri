@@ -75,7 +75,6 @@ function get (parsed, opts, fn) {
 
   // http.ClientRequest "response" event handler
   function onresponse (res) {
-    var err = null;
     var code = res.statusCode;
 
     // assign a Date to this response for the "Cache-Control" delta calculation
@@ -115,6 +114,7 @@ function get (parsed, opts, fn) {
 
     // if we didn't get a 2xx "success" status code, then create an Error object
     if (2 != type) {
+      var err;
       if (304 == code) {
         err = new NotModifiedError();
       } else if (404 == code) {
@@ -126,6 +126,9 @@ function get (parsed, opts, fn) {
         err.statusCode = code;
         err.code = code;
       }
+
+      res.resume();
+      return fn(err);
     }
 
     if (opts.redirects) {
@@ -134,7 +137,7 @@ function get (parsed, opts, fn) {
       res.redirects = opts.redirects;
     }
 
-    fn(err, res);
+    fn(null, res);
   }
 }
 
@@ -150,19 +153,22 @@ function get (parsed, opts, fn) {
 function isFresh (cache) {
   var cacheControl = cache.headers['cache-control'];
   if (cacheControl) {
-    console.log(cacheControl);
+    debug('Cache-Control: %s', cacheControl);
   }
 
   var expires = cache.headers.expires;
   if (expires) {
-    console.log(expires);
+    debug('Expires: %s', expires);
   }
 
   return false;
 }
 
 /**
+ * Attempts to return a previous Response object from a previous GET call to the
+ * same URI.
  *
+ * @api private
  */
 
 function getCache (parsed, cache) {
