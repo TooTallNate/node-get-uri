@@ -56,12 +56,15 @@ describe('get-uri', function () {
 
   describe('"file:" protocol', function () {
 
+    var cache;
+
     it('should work for local files', function (done) {
       var uri = 'file://' + __filename;
       fs.readFile(__filename, 'utf8', function (err, real) {
         if (err) return done(err);
         getUri(uri, function (err, rs) {
           if (err) return done(err);
+          cache = rs;
           streamToArray(rs, function (err, array) {
             if (err) return done(err);
             var str = Buffer.concat(array).toString('utf8');
@@ -72,6 +75,23 @@ describe('get-uri', function () {
       });
     });
 
+    it('should return ENOTFOUND for bad filenames', function (done) {
+      var uri = 'file://' + __filename + 'does-not-exist';
+      getUri(uri, function (err, rs) {
+        assert(err);
+        assert.equal('ENOTFOUND', err.code);
+        done();
+      });
+    });
+
+    it('should return ENOTMODIFIED for the same URI with `cache`', function (done) {
+      var uri = 'file://' + __filename;
+      getUri(uri, { cache: cache }, function (err, rs) {
+        assert(err);
+        assert.equal('ENOTMODIFIED', err.code);
+        done();
+      });
+    });
   });
 
   describe('"ftp:" protocol', function () {
