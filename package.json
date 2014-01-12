@@ -31,7 +31,8 @@
   },
   "devDependencies": {
     "mocha": "~1.16.2",
-    "stream-to-array": "~1.0.0"
+    "stream-to-array": "~1.0.0",
+    "ftpd": "~0.2.4"
   },
   "dependencies": {
     "data-uri-to-buffer": "0.0.3",
