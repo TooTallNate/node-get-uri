@@ -25,12 +25,17 @@ module.exports = get;
 function get (parsed, opts, fn) {
   debug('GET %s', parsed.href);
 
-  var cache = opts.cache;
-  var options = extend({}, opts, parsed);
+  var cache = getCache(parsed, opts.cache);
 
-  if (null == opts.redirects) {
-    // 5 redirects allowed by default
-    opts.redirects = 5;
+  // 5 redirects allowed by default
+  var maxRedirects = opts.hasOwnProperty('maxRedirects') ? opts.maxRedirects : 5;
+  debug('allowing %d max redirects', maxRedirects);
+
+  // first check the previous Expires and/or Cache-Control headers
+  // of a previous response if a `cache` was provided
+  if (cache && isFresh(cache)) {
+    debug('cache is "fresh" due to previous Expires and/or Cache-Control response headers');
+    return fn(new NotModifiedError());
   }
 
   var mod;
@@ -43,44 +48,77 @@ function get (parsed, opts, fn) {
     debug('using `http` core module');
   }
 
+  var options = extend({}, opts, parsed);
+
+  // add "cache validation" headers if a `cache` was provided
+  if (cache) {
+    if (!options.headers) options.headers = {};
+    if (cache.headers['last-modified']) {
+      options.headers['If-Modified-Since'] = cache.headers['last-modified'];
+      debug('added "If-Modified-Since" request header: %j', options.headers['If-Modified-Since']);
+    }
+    if (cache.headers.etag) {
+      options.headers['If-None-Match'] = cache.headers.etag;
+      debug('added "If-None-Match" request header: %j', cache.headers.etag);
+    }
+  }
+
   var req = mod.get(options);
   req.once('error', onerror);
   req.once('response', onresponse);
 
+  // http.ClientRequest "error" event handler
   function onerror (err) {
-    debug('http.Request "error" event: %s', err.stack || err);
+    debug('http.ClientRequest "error" event: %s', err.stack || err);
     fn(err);
   }
 
+  // http.ClientRequest "response" event handler
   function onresponse (res) {
     var err = null;
-
     var code = res.statusCode;
+
+    // assign a Date to this response for the "Cache-Control" delta calculation
+    res.date = new Date();
+    res.parsed = parsed;
+
     debug('got %d response status code', code);
     //console.log(res.headers);
 
     // any 2xx response is a "success" code
     var type = (code / 100 | 0);
 
-    if (2 != type) {
-      if (304 == code) {
-        err = new NotModifiedError();
-      } else if (404 == code) {
-        err = new NotFoundError();
-      } else if (3 == type && res.headers.location && opts.redirects > 0) {
-        var location = res.headers.location;
+    // check for a 3xx "redirect" status code
+    var location = res.headers.location;
+    if (3 == type && location) {
+      if (!opts.redirects) opts.redirects = [];
+      var redirects = opts.redirects;
+
+      if (redirects.length < maxRedirects) {
         debug('got a "redirect" status code with Location: %j', location);
 
         // flush this response - we're not going to use it
         res.resume();
 
+        // hang on to this Response object for the "redirects" Array
+        redirects.push(res);
+
         var newUri = url.resolve(parsed, location);
         debug('resolved redirect URL: %j', newUri);
 
-        opts.redirects--;
-        debug('%d more redirects allowed after this one', opts.redirects);
+        var left = maxRedirects - redirects.length;
+        debug('%d more redirects allowed after this one', left);
 
         return get(url.parse(newUri), opts, fn);
+      }
+    }
+
+    // if we didn't get a 2xx "success" status code, then create an Error object
+    if (2 != type) {
+      if (304 == code) {
+        err = new NotModifiedError();
+      } else if (404 == code) {
+        err = new NotFoundError();
       } else {
         // other HTTP-level error
         var message = http.STATUS_CODES[code];
@@ -90,6 +128,54 @@ function get (parsed, opts, fn) {
       }
     }
 
+    if (opts.redirects) {
+      // store a reference to the "redirects" Array on the Response object so that
+      // they can be inspected during a subsequent call to GET the same URI
+      res.redirects = opts.redirects;
+    }
+
     fn(err, res);
+  }
+}
+
+/**
+ * Returns `true` if the provided cache's "freshness" is valid. That is, either
+ * the Cache-Control header or Expires header values are still within the allowed
+ * time period.
+ *
+ * @return {Boolean}
+ * @api private
+ */
+
+function isFresh (cache) {
+  var cacheControl = cache.headers['cache-control'];
+  if (cacheControl) {
+    console.log(cacheControl);
+  }
+
+  var expires = cache.headers.expires;
+  if (expires) {
+    console.log(expires);
+  }
+
+  return false;
+}
+
+/**
+ *
+ */
+
+function getCache (parsed, cache) {
+  if (!cache) return;
+  var href = parsed.href;
+  if (cache.parsed.href == href) {
+    return cache;
+  }
+  var redirects = cache.redirects;
+  if (redirects) {
+    for (var i = 0; i < redirects.length; i++) {
+      var c = getCache(parsed, redirects[i]);
+      if (c) return c;
+    }
   }
 }
