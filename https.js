@@ -3,7 +3,9 @@
  * Module dependencies.
  */
 
+var http = require('./http');
 var https = require('https');
+
 /**
  * Module exports.
  */
@@ -17,4 +19,6 @@ module.exports = get;
  */
 
 function get (parsed, opts, fn) {
+  opts.http = https;
+  http(parsed, opts, fn);
 }
