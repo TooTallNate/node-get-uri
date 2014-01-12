@@ -4,6 +4,7 @@
  */
 
 var parse = require('url').parse;
+var debug = require('debug')('get-uri');
 
 /**
  * Module exports.
@@ -41,6 +42,8 @@ exports.protocols = {
  */
 
 function getUri (uri, opts, fn) {
+  debug('getUri(%j)', uri);
+
   if ('function' == typeof opts) {
     fn = opts;
     opts = null;
