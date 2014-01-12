@@ -9,6 +9,9 @@ var dataUriToBuffer = require('data-uri-to-buffer');
 var NotModifiedError = require('./notmodified');
 var debug = require('debug')('get-uri:data');
 
+// for node v0.8.x support, remove after v0.12.x
+if (!Readable) Readable = require('readable-stream');
+
 /**
  * Module exports.
  */
