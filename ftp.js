@@ -99,6 +99,7 @@ function get (parsed, opts, fn) {
     var entry;
     for (var i = 0; i < list.length; i++) {
       entry = list[i];
+      debug('file %i: %j', i, entry.name);
       if (entry.name == name) {
         break;
       }
