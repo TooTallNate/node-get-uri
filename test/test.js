@@ -115,8 +115,6 @@ describe('get-uri', function () {
     before(function (done) {
       var options = {
         logLevel: -1,
-        pasvPortRangeStart: 4000,
-        pasvPortRangeEnd: 5000,
         getInitialCwd: function (socket, fn) {
           fn(null, '/');
         },
