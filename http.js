@@ -53,13 +53,17 @@ function get (parsed, opts, fn) {
   // add "cache validation" headers if a `cache` was provided
   if (cache) {
     if (!options.headers) options.headers = {};
-    if (cache.headers['last-modified']) {
-      options.headers['If-Modified-Since'] = cache.headers['last-modified'];
-      debug('added "If-Modified-Since" request header: %j', options.headers['If-Modified-Since']);
+
+    var lastModified = cache.headers['last-modified'];
+    if (lastModified != null) {
+      options.headers['If-Modified-Since'] = lastModified;
+      debug('added "If-Modified-Since" request header: %j', lastModified);
     }
-    if (cache.headers.etag) {
-      options.headers['If-None-Match'] = cache.headers.etag;
-      debug('added "If-None-Match" request header: %j', cache.headers.etag);
+
+    var etag = cache.headers.etag;
+    if (etag != null) {
+      options.headers['If-None-Match'] = etag;
+      debug('added "If-None-Match" request header: %j', etag);
     }
   }
 
