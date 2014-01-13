@@ -34,7 +34,6 @@ function get (parsed, opts, fn) {
   // first check the previous Expires and/or Cache-Control headers
   // of a previous response if a `cache` was provided
   if (cache && isFresh(cache)) {
-    debug('cache is "fresh" due to previous Expires and/or Cache-Control response headers');
     return fn(new NotModifiedError());
   }
 
@@ -156,13 +155,42 @@ function get (parsed, opts, fn) {
 
 function isFresh (cache) {
   var cacheControl = cache.headers['cache-control'];
-  if (cacheControl) {
-    debug('Cache-Control: %s', cacheControl);
-  }
-
   var expires = cache.headers.expires;
-  if (expires) {
+  var fresh;
+
+  if (cacheControl) {
+    // for Cache-Control rules, see: http://www.mnot.net/cache_docs/#CACHE-CONTROL
+    debug('Cache-Control: %s', cacheControl);
+
+    var parts = cacheControl.split(/,\s*?\b/);
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i];
+      var subparts = part.split('=');
+      var name = subparts[0];
+      switch (name) {
+        case 'max-age':
+          var val = +subparts[1];
+          expires = new Date(+cache.date + (val * 1000));
+          fresh = new Date() < expires;
+          if (fresh) debug('cache is "fresh" due to previous "%s" Cache-Control param', part);
+          return fresh;
+        case 'must-revalidate':
+          // XXX: what we supposed to do here?
+          break;
+        case 'no-cache':
+        case 'no-store':
+          debug('cache is "stale" due to explicit "%s" Cache-Control param', name);
+          return false;
+      }
+    }
+
+  } else if (expires) {
+    // for Expires rules, see: http://www.mnot.net/cache_docs/#EXPIRES
     debug('Expires: %s', expires);
+
+    fresh = new Date() < new Date(expires);
+    if (fresh) debug('cache is "fresh" due to previous Expires response header');
+    return fresh;
   }
 
   return false;
