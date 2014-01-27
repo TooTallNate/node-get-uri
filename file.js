@@ -4,7 +4,6 @@
  */
 
 var fs = require('fs');
-var path = require('path');
 var uri2path = require('file-uri-to-path');
 var NotFoundError = require('./notfound');
 var NotModifiedError = require('./notmodified');
