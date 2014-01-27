@@ -5,6 +5,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var uri2path = require('file-uri-to-path');
 var NotFoundError = require('./notfound');
 var NotModifiedError = require('./notmodified');
 var debug = require('debug')('get-uri:file');
@@ -31,8 +32,8 @@ function get (parsed, opts, fn) {
   var mode = opts.hasOwnProperty('mode') ? options.mode : 438; /*=0666*/
 
   // convert URI → Path
-  // TODO: will probably need better Windows support for this someday (see #3)
-  var filepath = path.normalize(decodeURIComponent(parsed.pathname));
+  var uri = parsed.href;
+  var filepath = uri2path(uri);
   debug('normalized pathname: %j', filepath);
 
   // open() first to get a fd and ensure that the file exists
