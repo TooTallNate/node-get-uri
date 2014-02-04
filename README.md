@@ -29,39 +29,15 @@ $ npm install get-uri
 Example
 -------
 
+To simply get a `stream.Readable` instance from a `file:` URI, try something like:
+
 ``` js
 var getUri = require('get-uri');
 
-// maps to a `fs.ReadStream` instance
+// `file:` maps to a `fs.ReadStream` instance…
 getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
-  if (err) {
-    if ('ENOTFOUND' == err.code) {
-      // bad file path requested
-    } else {
-      // something else bad happened...
-      throw err;
-    }
-  }
-
+  if (err) throw err;
   rs.pipe(process.stdout);
-
-  // ... some time later, we need to get this same URI again, pass in the
-  // previous `stream.Readable` instance as `cache` option to potentially
-  // receive "ENOTMODIFIED" responses:
-  getUri('file:///Users/nrajlich/wat.json', { cache: rs }, function (err, rs2) {
-    if (err) {
-      if ('ENOTFOUND' == err.code) {
-        // bad file path requested
-      } else if ('ENOTMODIFIED' == err.code) {
-        // source file has not been modified since last time it was requested,
-        // so `rs2` is undefined and you are expected to re-use results from
-        // a previous call to `getUri()`
-      } else {
-        // something else bad happened...
-        throw err;
-      }
-    }
-  });
 });
 ```
 
