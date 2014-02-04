@@ -66,6 +66,30 @@ getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
 ```
 
 
+Missing Endpoints
+-----------------
+
+When you pass in a URI in which the resource referenced does not exist on the
+destination server, then a `NotFoundError` will be returned. The `code` of the
+error instance is set to `"ENOTFOUND"`, so you can special-case that in your code
+to detect when a bad filename is requested:
+
+``` js
+getUri('http://example.com/resource.json', function (err, rs) {
+  if (err) {
+    if ('ENOTFOUND' == err.code) {
+      // bad file path requested
+    } else {
+      // something else bad happened...
+      throw err;
+    }
+  }
+
+  // your app code…
+});
+```
+
+
 Cacheability
 ------------
 
@@ -80,22 +104,38 @@ that same URI, then a `NotModifiedError` instance will be returned with it's
 `code` property set to `"ENOTMODIFIED"`.
 
 When the `"ENOTMODIFIED"` error occurs, then you can safely re-use the
-results from the previous `getUri()` call for that same URI.
+results from the previous `getUri()` call for that same URI:
 
+``` js
+// maps to a `fs.ReadStream` instance
+getUri('http://example.com/resource.json', function (err, rs) {
+  if (err) throw err;
 
-Missing Endpoints
------------------
-
-When you pass in a URI in which the resource referenced does not exist on the
-destination server, then a `NotFoundError` will be returned. The `code` of the
-error instance is set to `"ENOTFOUND"`, so you can special-case that in your code
-to detect when a bad filename is requested.
+  // … some time later, if you need to get this same URI again, pass in the
+  // previous `stream.Readable` instance as `cache` option to potentially
+  // receive an "ENOTMODIFIED" response:
+  getUri('http://example.com/resource.json', function (err, rs2) {
+    if (err) {
+      if ('ENOTFOUND' == err.code) {
+        // bad file path requested
+      } else if ('ENOTMODIFIED' == err.code) {
+        // source file has not been modified since last time it was requested,
+        // so `rs2` is undefined and you are expected to re-use results from
+        // a previous call to `getUri()`
+      } else {
+        // something else bad happened...
+        throw err;
+      }
+    }
+  });
+});
+```
 
 
 API
 ---
 
-### getUri(String uri[, Object options]) → stream.Readable
+### getUri(String uri[, Object options,] Function callback)
 
 A `uri` String is required. An optional `options` object may be passed in:
 
@@ -104,6 +144,9 @@ A `uri` String is required. An optional `options` object may be passed in:
 Any other options passed in to the `options` object will be passed through
 to the low-level connection creation functions (`http.get()`, `ftp.connect()`,
 etc).
+
+Invokes the given `callback` function with a `stream.Readable` instance to
+read the resource at the given `uri`.
 
 License
 -------
