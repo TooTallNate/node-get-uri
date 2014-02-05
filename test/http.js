@@ -5,7 +5,6 @@
 
 var fs = require('fs');
 var st = require('st');
-var ftpd = require('ftpd');
 var path = require('path');
 var http = require('http');
 var getUri = require('../');
