@@ -1,4 +1,16 @@
 
+0.1.1 / 2014-02-05
+==================
+
+  * http: initial shot at "cached redirects" logic
+  * package: pin "ftpd" version to v0.2.4 (for tests)
+  * test: refactor tests into their own files
+  * file: remove unused `path` require
+  * test: fix "file:" URI tests on Windows
+  * file: add better Windows support for file:// URIs
+  * http: add the Cache-Control and Expires respecting logic
+  * http: clean up logic a bit
+
 0.1.0 / 2014-01-12
 ==================
 
