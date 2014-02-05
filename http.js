@@ -34,7 +34,19 @@ function get (parsed, opts, fn) {
   // first check the previous Expires and/or Cache-Control headers
   // of a previous response if a `cache` was provided
   if (cache && isFresh(cache)) {
-    return fn(new NotModifiedError());
+
+    // check for a 3xx "redirect" status code on the previous cache
+    var location = cache.headers.location;
+    var type = (cache.statusCode / 100 | 0);
+    if (3 == type && location) {
+      debug('cached redirect');
+      fn(new Error('TODO: implement cached redirects!'));
+    } else {
+      // otherwise we assume that it's the destination endpoint,
+      // since there's nowhere else to redirect to
+      fn(new NotModifiedError());
+    }
+    return;
   }
 
   var mod;
