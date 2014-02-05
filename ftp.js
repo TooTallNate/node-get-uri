@@ -33,7 +33,6 @@ function get (parsed, opts, fn) {
   function onready () {
     // first we have to figure out the Last Modified date.
     // try the MDTM command first, which is an optional extension command.
-    console.error(parsed);
     client.lastMod(filepath, onlastmod);
   }
 
@@ -63,7 +62,6 @@ function get (parsed, opts, fn) {
   }
 
   function onlastmod (err, lastmod) {
-    console.error(err, lastmod);
     // handle the "file not found" error code
     if (err) {
       if (550 == err.code) {
@@ -94,7 +92,6 @@ function get (parsed, opts, fn) {
   }
 
   function onlist (err, list) {
-    console.error(err, list);
     if (err) return onerror(err);
     var name = path.basename(filepath);
 
