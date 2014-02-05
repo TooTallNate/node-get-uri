@@ -33,6 +33,7 @@ function get (parsed, opts, fn) {
   function onready () {
     // first we have to figure out the Last Modified date.
     // try the MDTM command first, which is an optional extension command.
+    console.error(parsed);
     client.lastMod(filepath, onlastmod);
   }
 
