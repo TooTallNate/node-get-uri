@@ -1,4 +1,10 @@
 
+0.1.2 / 2014-04-03
+==================
+
+  * package: loosen semver required versions
+  * data: just always use the "readable-stream" module
+
 0.1.1 / 2014-02-05
 ==================
 
