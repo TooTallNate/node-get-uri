@@ -1,6 +1,6 @@
 {
   "name": "get-uri",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Returns a `stream.Readable` from a URI string",
   "main": "index.js",
   "scripts": {
