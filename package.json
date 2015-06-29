@@ -30,7 +30,7 @@
     "url": "https://github.com/TooTallNate/node-get-uri/issues"
   },
   "devDependencies": {
-    "mocha": ">= 1.16.2 && < 2",
+    "mocha": "2",
     "stream-to-array": "1",
     "ftpd": ">= 0.2.4 && < 1",
     "st": ">= 0.2.3 && < 1"
