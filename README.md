@@ -90,7 +90,8 @@ getUri('http://example.com/resource.json', function (err, rs) {
   // … some time later, if you need to get this same URI again, pass in the
   // previous `stream.Readable` instance as `cache` option to potentially
   // receive an "ENOTMODIFIED" response:
-  getUri('http://example.com/resource.json', function (err, rs2) {
+  var opts = { cache: rs };
+  getUri('http://example.com/resource.json', opts, function (err, rs2) {
     if (err) {
       if ('ENOTFOUND' == err.code) {
         // bad file path requested
