@@ -38,7 +38,7 @@
   "dependencies": {
     "data-uri-to-buffer": "0",
     "ftp": "~0.3.5",
-    "debug": "0",
+    "debug": "2",
     "extend": "~1.2.1",
     "file-uri-to-path": "0",
     "readable-stream": "~1.0.26-4"
