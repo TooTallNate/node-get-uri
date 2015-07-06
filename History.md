@@ -1,4 +1,16 @@
 
+0.1.4 / 2015-07-06
+==================
+
+  * README: use SVG for Travis-CI badge
+  * README: properly do cache example
+  * use %o debug formatter most of the time
+  * package: update "readable-stream" to v2
+  * package: update "extend" to v3
+  * package: update "debug" to v2
+  * package: update "mocha" to v2
+  * travis: test node v0.8, v0.10, and v0.12
+
 0.1.3 / 2014-04-03
 ==================
 
