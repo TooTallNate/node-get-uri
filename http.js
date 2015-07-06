@@ -23,13 +23,13 @@ module.exports = get;
  */
 
 function get (parsed, opts, fn) {
-  debug('GET %s', parsed.href);
+  debug('GET %o', parsed.href);
 
   var cache = getCache(parsed, opts.cache);
 
   // 5 redirects allowed by default
   var maxRedirects = opts.hasOwnProperty('maxRedirects') ? opts.maxRedirects : 5;
-  debug('allowing %d max redirects', maxRedirects);
+  debug('allowing %o max redirects', maxRedirects);
 
   // first check the previous Expires and/or Cache-Control headers
   // of a previous response if a `cache` was provided
@@ -68,13 +68,13 @@ function get (parsed, opts, fn) {
     var lastModified = cache.headers['last-modified'];
     if (lastModified != null) {
       options.headers['If-Modified-Since'] = lastModified;
-      debug('added "If-Modified-Since" request header: %j', lastModified);
+      debug('added "If-Modified-Since" request header: %o', lastModified);
     }
 
     var etag = cache.headers.etag;
     if (etag != null) {
       options.headers['If-None-Match'] = etag;
-      debug('added "If-None-Match" request header: %j', etag);
+      debug('added "If-None-Match" request header: %o', etag);
     }
   }
 
@@ -84,7 +84,7 @@ function get (parsed, opts, fn) {
 
   // http.ClientRequest "error" event handler
   function onerror (err) {
-    debug('http.ClientRequest "error" event: %s', err.stack || err);
+    debug('http.ClientRequest "error" event: %o', err.stack || err);
     fn(err);
   }
 
@@ -96,8 +96,7 @@ function get (parsed, opts, fn) {
     res.date = new Date();
     res.parsed = parsed;
 
-    debug('got %d response status code', code);
-    //console.log(res.headers);
+    debug('got %o response status code', code);
 
     // any 2xx response is a "success" code
     var type = (code / 100 | 0);
@@ -109,7 +108,7 @@ function get (parsed, opts, fn) {
       var redirects = opts.redirects;
 
       if (redirects.length < maxRedirects) {
-        debug('got a "redirect" status code with Location: %j', location);
+        debug('got a "redirect" status code with Location: %o', location);
 
         // flush this response - we're not going to use it
         res.resume();
@@ -118,10 +117,10 @@ function get (parsed, opts, fn) {
         redirects.push(res);
 
         var newUri = url.resolve(parsed, location);
-        debug('resolved redirect URL: %j', newUri);
+        debug('resolved redirect URL: %o', newUri);
 
         var left = maxRedirects - redirects.length;
-        debug('%d more redirects allowed after this one', left);
+        debug('%o more redirects allowed after this one', left);
 
         return get(url.parse(newUri), opts, fn);
       }
@@ -172,7 +171,7 @@ function isFresh (cache) {
 
   if (cacheControl) {
     // for Cache-Control rules, see: http://www.mnot.net/cache_docs/#CACHE-CONTROL
-    debug('Cache-Control: %s', cacheControl);
+    debug('Cache-Control: %o', cacheControl);
 
     var parts = cacheControl.split(/,\s*?\b/);
     for (var i = 0; i < parts.length; i++) {
@@ -184,21 +183,21 @@ function isFresh (cache) {
           var val = +subparts[1];
           expires = new Date(+cache.date + (val * 1000));
           fresh = new Date() < expires;
-          if (fresh) debug('cache is "fresh" due to previous "%s" Cache-Control param', part);
+          if (fresh) debug('cache is "fresh" due to previous %o Cache-Control param', part);
           return fresh;
         case 'must-revalidate':
           // XXX: what we supposed to do here?
           break;
         case 'no-cache':
         case 'no-store':
-          debug('cache is "stale" due to explicit "%s" Cache-Control param', name);
+          debug('cache is "stale" due to explicit %o Cache-Control param', name);
           return false;
       }
     }
 
   } else if (expires) {
     // for Expires rules, see: http://www.mnot.net/cache_docs/#EXPIRES
-    debug('Expires: %s', expires);
+    debug('Expires: %o', expires);
 
     fresh = new Date() < new Date(expires);
     if (fresh) debug('cache is "fresh" due to previous Expires response header');

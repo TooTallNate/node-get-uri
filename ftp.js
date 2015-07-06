@@ -37,7 +37,7 @@ function get (parsed, opts, fn) {
   }
 
   function ongreeting (greeting) {
-    debug('FTP greeting: "%s"', greeting);
+    debug('FTP greeting: %o', greeting);
   }
 
   function onerror (err) {
@@ -99,7 +99,7 @@ function get (parsed, opts, fn) {
     var entry;
     for (var i = 0; i < list.length; i++) {
       entry = list[i];
-      debug('file %d: %j', i, entry.name);
+      debug('file %o: %o', i, entry.name);
       if (entry.name == name) {
         break;
       }

@@ -30,11 +30,11 @@ function get (parsed, opts, fn) {
   var shasum = crypto.createHash('sha1');
   shasum.update(uri);
   var hash = shasum.digest('hex');
-  debug('generated SHA1 hash for "data:" URI: "%s"', hash);
+  debug('generated SHA1 hash for "data:" URI: %o', hash);
 
   // check if the cache is the same "data:" URI that was previously passed in.
   if (cache && cache.hash == hash) {
-    debug('got matching cache SHA1 hash: "%s"', hash);
+    debug('got matching cache SHA1 hash: %o', hash);
     fn(new NotModifiedError());
   } else {
     debug('creating Readable stream from "data:" URI buffer');

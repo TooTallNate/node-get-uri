@@ -42,7 +42,7 @@ exports.protocols = {
  */
 
 function getUri (uri, opts, fn) {
-  debug('getUri(%j)', uri);
+  debug('getUri(%o)', uri);
 
   if ('function' == typeof opts) {
     fn = opts;

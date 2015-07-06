@@ -33,7 +33,7 @@ function get (parsed, opts, fn) {
   // convert URI → Path
   var uri = parsed.href;
   var filepath = uri2path(uri);
-  debug('normalized pathname: %j', filepath);
+  debug('normalized pathname: %o', filepath);
 
   // open() first to get a fd and ensure that the file exists
   fs.open(filepath, flags, mode, onopen);
@@ -46,7 +46,7 @@ function get (parsed, opts, fn) {
   }
 
   function onclose () {
-    debug('closed fd %d', fd);
+    debug('closed fd %o', fd);
   }
 
   function onopen (err, _fd) {
