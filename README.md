@@ -1,7 +1,7 @@
 get-uri
 =======
 ### Returns a `stream.Readable` from a URI string
-[![Build Status](https://travis-ci.org/TooTallNate/node-get-uri.png?branch=master)](https://travis-ci.org/TooTallNate/node-get-uri)
+[![Build Status](https://travis-ci.org/TooTallNate/node-get-uri.svg?branch=master)](https://travis-ci.org/TooTallNate/node-get-uri)
 
 This high-level module accepts a URI string and returns a `Readable` stream
 instance. There is built-in support for a variety of "protocols", and it's
