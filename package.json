@@ -41,6 +41,6 @@
     "debug": "2",
     "extend": "3",
     "file-uri-to-path": "0",
-    "readable-stream": "~1.0.26-4"
+    "readable-stream": "2"
   }
 }
