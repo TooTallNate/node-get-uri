@@ -25,6 +25,28 @@ exports.protocols = {
 };
 
 /**
+ * Adds a new protocol via module `require()`.
+ */
+
+exports.use = function use (name) {
+  var setup;
+  try {
+    setup = require(name);
+  } catch (e) {
+    if (e.code === 'MODULE_NOT_FOUND') {
+      // support `use('tftp') -> require('get-uri-tftp')`
+      setup = require('get-uri-' + name);
+    } else {
+      throw e;
+    }
+  }
+  if ('function' !== typeof setup) {
+    throw new TypeError('expected a protocol setup function, got ' + (typeof setup));
+  }
+  setup(exports.protocols);
+};
+
+/**
  * Async function that returns a `stream.Readable` instance to the
  * callback function that will output the contents of the given URI.
  *
