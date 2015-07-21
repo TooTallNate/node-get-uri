@@ -1,4 +1,10 @@
 
+1.1.0 / 2015-07-08
+==================
+
+  * add 'use strict' declaration
+  * add `use()` helper function for adding external protocols
+
 1.0.0 / 2015-07-06
 ==================
 
