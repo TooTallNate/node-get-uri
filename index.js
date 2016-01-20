@@ -5,6 +5,7 @@
  */
 
 var parse = require('url').parse;
+var deprecate = require('util').deprecate;
 var debug = require('debug')('get-uri');
 
 /**
@@ -29,7 +30,7 @@ exports.protocols = {
  * Adds a new protocol via module `require()`.
  */
 
-exports.use = function use (name) {
+exports.use = deprecate(function use (name) {
   var setup;
   try {
     setup = require(name);
@@ -45,7 +46,7 @@ exports.use = function use (name) {
     throw new TypeError('expected a protocol setup function, got ' + (typeof setup));
   }
   setup(exports.protocols);
-};
+}, '`getUri.use()` is deprecated. Instead, invoke your extend module like `require(\'get-uri-foo\')(getUri)`');
 
 /**
  * Async function that returns a `stream.Readable` instance to the
