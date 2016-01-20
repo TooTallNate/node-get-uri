@@ -1,4 +1,10 @@
 
+1.1.1 / 2016-01-20
+==================
+
+  * index: deprecate `.use()`
+  * travis: test more node versions
+
 1.1.0 / 2015-07-08
 ==================
 
