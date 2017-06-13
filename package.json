@@ -30,10 +30,10 @@
     "url": "https://github.com/TooTallNate/node-get-uri/issues"
   },
   "devDependencies": {
+    "ftpd": "sstur/nodeftpd",
     "mocha": "2",
-    "stream-to-array": "1",
-    "ftpd": ">= 0.2.4 && < 1",
-    "st": ">= 0.2.3 && < 1"
+    "st": ">= 0.2.3 && < 1",
+    "stream-to-array": "1"
   },
   "dependencies": {
     "data-uri-to-buffer": "0",
