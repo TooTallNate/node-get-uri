@@ -5,6 +5,7 @@
 
 var url = require('url');
 var http = require('http');
+var https = require('https');
 var extend = require('extend');
 var NotFoundError = require('./notfound');
 var NotModifiedError = require('./notmodified');
@@ -122,7 +123,13 @@ function get (parsed, opts, fn) {
         var left = maxRedirects - redirects.length;
         debug('%o more redirects allowed after this one', left);
 
-        return get(url.parse(newUri), opts, fn);
+        // check if redirecting to a different protocol
+        var parsedUrl = url.parse(newUri);
+        if (parsedUrl.protocol !== parsed.protocol) {
+          opts.http = parsedUrl.protocol === 'https:' ? https : undefined;
+        }
+
+        return get(parsedUrl, opts, fn);
       }
     }
 
