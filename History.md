@@ -1,4 +1,11 @@
 
+2.0.2 / 2018-05-15
+==================
+
+  * Test Node 9 and 10
+  * Fix redirect protocol change issue for `http` (#11)
+  * Attempt to fix broken npm 5 :(
+
 2.0.1 / 2017-07-11
 ==================
 
