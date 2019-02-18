@@ -123,6 +123,11 @@ function get (parsed, opts, fn) {
   opts.port = parseInt(parsed.port, 10) || 21;
   if (debug.enabled) opts.debug = debug;
 
-  // TODO: add auth
+  if (parsed.auth) {
+    const [user, password] = parsed.auth.split(":");
+    opts.user = user;
+    opts.password = password;
+  }
+  
   client.connect(opts);
 }
