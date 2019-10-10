@@ -4,7 +4,7 @@
  */
 
 var crypto = require('crypto');
-var Readable = require('readable-stream');;
+var Readable = require('stream').Readable;
 var dataUriToBuffer = require('data-uri-to-buffer');
 var NotModifiedError = require('./notmodified');
 var debug = require('debug')('get-uri:data');

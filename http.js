@@ -6,7 +6,6 @@
 var url = require('url');
 var http = require('http');
 var https = require('https');
-var extend = require('extend');
 var NotFoundError = require('./notfound');
 var NotModifiedError = require('./notmodified');
 var debug = require('debug')('get-uri:http');
@@ -60,7 +59,7 @@ function get (parsed, opts, fn) {
     debug('using `http` core module');
   }
 
-  var options = extend({}, opts, parsed);
+  var options = Object.assign({}, opts, parsed);
 
   // add "cache validation" headers if a `cache` was provided
   if (cache) {
