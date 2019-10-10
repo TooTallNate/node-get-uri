@@ -32,7 +32,7 @@
   "devDependencies": {
     "ftpd": "sstur/nodeftpd",
     "mocha": "3",
-    "st": "^0.5.5",
+    "st": "^1.2.2",
     "stream-to-array": "2"
   },
   "dependencies": {
