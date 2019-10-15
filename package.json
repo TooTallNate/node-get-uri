@@ -32,13 +32,13 @@
   "devDependencies": {
     "ftpd": "sstur/nodeftpd",
     "mocha": "6",
-    "st": "1",
+    "st": "^1.2.2",
     "stream-to-array": "2"
   },
   "dependencies": {
     "data-uri-to-buffer": "3",
-    "ftp": "~0.3.10",
+    "ftp": "^0.3.10",
     "debug": "4",
-    "file-uri-to-path": "1"
+    "file-uri-to-path": "2"
   }
 }
