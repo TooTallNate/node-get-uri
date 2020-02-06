@@ -1,8 +1,7 @@
-import FTP, { Options } from 'ftp';
+import FTP, { ListingElement, Options } from 'ftp';
 import { Readable } from 'stream';
 import { basename, dirname } from 'path';
 import { UrlWithStringQuery } from 'url';
-import { promisify } from 'util';
 import createDebug from 'debug';
 import { GetUriOptions } from '.';
 import once from './once';
@@ -64,8 +63,11 @@ export default async function get(
 		// first we have to figure out the Last Modified date.
 		// try the MDTM command first, which is an optional extension command.
 		try {
-			const lastMod = promisify(client.lastMod.bind(client));
-			lastModified = await lastMod(filepath);
+			lastModified = await new Promise((resolve, reject) => {
+				client.lastMod(filepath, (err, res) => {
+					err ? reject(err) : resolve(res);
+				});
+			});
 		} catch (err) {
 			// handle the "file not found" error code
 			if (err.code === 550) {
@@ -76,9 +78,14 @@ export default async function get(
 		if (!lastModified) {
 			// Try to get the last modified date via the LIST command (uses
 			// more bandwidth, but is more compatible with older FTP servers
-			const getList = promisify(client.list.bind(client));
-			// @ts-ignore
-			const list = await getList(dirname(filepath));
+			const list = await new Promise<ListingElement[]>(
+				(resolve, reject) => {
+					client.list(dirname(filepath), (err, res) => {
+						err ? reject(err) : resolve(res);
+					});
+				}
+			);
+
 			// attempt to find the "entry" with a matching "name"
 			const name = basename(filepath);
 			let entry;
@@ -106,8 +113,13 @@ export default async function get(
 		// XXX: a small timeout seemed necessary otherwise FTP servers
 		// were returning empty sockets for the file occasionally
 		// setTimeout(client.get.bind(client, filepath, onfile), 10);
-		const getFile = promisify(client.get.bind(client));
-		const rs = (await getFile(filepath)) as FTPReadable;
+		const rs = (await new Promise<NodeJS.ReadableStream>(
+			(resolve, reject) => {
+				client.get(filepath, (err, res) => {
+					err ? reject(err) : resolve(res);
+				});
+			}
+		)) as FTPReadable;
 		rs.once('end', onend);
 		rs.lastModified = lastModified;
 		return rs;
