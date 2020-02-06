@@ -88,15 +88,7 @@ export default async function get(
 
 			// attempt to find the "entry" with a matching "name"
 			const name = basename(filepath);
-			let entry;
-			for (let i = 0; i < list.length; i++) {
-				entry = list[i];
-				debug('file %o: %o', i, entry.name);
-				if (entry.name === name) {
-					break;
-				}
-				entry = null;
-			}
+			const entry = list.find(e => e.name === name);
 			if (entry) {
 				lastModified = entry.date;
 			}
