@@ -1,74 +1,70 @@
-
 /**
  * Module dependencies.
  */
 
-var fs = require('fs');
-var st = require('st');
-var path = require('path');
-var http = require('http');
-var getUri = require('../');
-var assert = require('assert');
-var streamToArray = require('stream-to-array');
+let fs = require('fs');
+let st = require('st');
+let path = require('path');
+let http = require('http');
+let assert = require('assert');
+let streamToArray = require('stream-to-array');
+let getUri = require('../');
 
-describe('get-uri', function () {
+describe('get-uri', function() {
+	describe('"http:" protocol', function() {
+		let port;
+		let cache;
+		let server;
 
-  describe('"http:" protocol', function () {
+		before(function(done) {
+			// setup target HTTP server
+			server = http.createServer(st(__dirname));
+			server.listen(function() {
+				port = server.address().port;
+				done();
+			});
+		});
 
-    var port;
-    var cache;
-    var server;
+		after(function(done) {
+			server.once('close', function() {
+				done();
+			});
+			server.close();
+		});
 
-    before(function (done) {
-      // setup target HTTP server
-      server = http.createServer(st(__dirname));
-      server.listen(function () {
-        port = server.address().port;
-        done();
-      });
-    });
+		it('should work for HTTP endpoints', function(done) {
+			let uri = `http://127.0.0.1:${port}/${path.basename(__filename)}`;
+			fs.readFile(__filename, 'utf8', function(err, real) {
+				if (err) return done(err);
+				getUri(uri, function(err, rs) {
+					if (err) return done(err);
+					cache = rs;
+					streamToArray(rs, function(err, array) {
+						if (err) return done(err);
+						let str = Buffer.concat(array).toString('utf8');
+						assert.equal(str, real);
+						done();
+					});
+				});
+			});
+		});
 
-    after(function (done) {
-      server.once('close', function () { done(); });
-      server.close();
-    });
+		it('should return ENOTFOUND for bad filenames', function(done) {
+			let uri = `http://127.0.0.1:${port}/does-not-exist`;
+			getUri(uri, function(err, rs) {
+				assert(err);
+				assert.equal('ENOTFOUND', err.code);
+				done();
+			});
+		});
 
-    it('should work for HTTP endpoints', function (done) {
-
-      var uri = 'http://127.0.0.1:' + port + '/' + path.basename(__filename);
-      fs.readFile(__filename, 'utf8', function (err, real) {
-        if (err) return done(err);
-        getUri(uri, function (err, rs) {
-          if (err) return done(err);
-          cache = rs;
-          streamToArray(rs, function (err, array) {
-            if (err) return done(err);
-            var str = Buffer.concat(array).toString('utf8');
-            assert.equal(str, real);
-            done();
-          });
-        });
-      });
-    });
-
-    it('should return ENOTFOUND for bad filenames', function (done) {
-      var uri = 'http://127.0.0.1:' + port + '/does-not-exist';
-      getUri(uri, function (err, rs) {
-        assert(err);
-        assert.equal('ENOTFOUND', err.code);
-        done();
-      });
-    });
-
-    it('should return ENOTMODIFIED for the same URI with `cache`', function (done) {
-      var uri = 'http://127.0.0.1:' + port + '/' + path.basename(__filename);
-      getUri(uri, { cache: cache }, function (err, rs) {
-        assert(err);
-        assert.equal('ENOTMODIFIED', err.code);
-        done();
-      });
-    });
-
-  });
-
+		it('should return ENOTMODIFIED for the same URI with `cache`', function(done) {
+			let uri = `http://127.0.0.1:${port}/${path.basename(__filename)}`;
+			getUri(uri, { cache }, function(err, rs) {
+				assert(err);
+				assert.equal('ENOTMODIFIED', err.code);
+				done();
+			});
+		});
+	});
 });

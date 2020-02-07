@@ -1,26 +1,24 @@
-
 /**
  * Module dependencies.
  */
 
-var getUri = require('../');
-var assert = require('assert');
+let assert = require('assert');
+let getUri = require('../');
 
-describe('get-uri', function () {
+describe('get-uri', function() {
+	it('should return promise when no callback function is given', function(done) {
+		const p = getUri();
+		assert.equal(typeof p.then, 'function');
+		p.catch(err => {
+			assert.equal(err.name, 'TypeError');
+			done();
+		});
+	});
 
-  describe('bad input', function () {
-    it('should throw a TypeError when callback function is given', function () {
-      assert.throws(function () {
-        getUri();
-      }, TypeError);
-    });
-
-    it('should return a TypeError when no URI is given', function (done) {
-      getUri(null, function (err) {
-        assert.equal(err.name, 'TypeError');
-        done();
-      });
-    });
-  });
-
+	it('should return a TypeError when no URI is given', function(done) {
+		getUri(null, function(err) {
+			assert.equal(err.name, 'TypeError');
+			done();
+		});
+	});
 });
