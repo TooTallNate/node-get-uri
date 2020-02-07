@@ -32,13 +32,13 @@ export default async function get(
 ): Promise<Readable> {
 	// need to create a SHA1 hash of the URI string, for cacheability checks
 	// in future `getUri()` calls with the same data URI passed in.
-	let shasum = createHash('sha1');
+	const shasum = createHash('sha1');
 	shasum.update(uri);
-	let hash = shasum.digest('hex');
+	const hash = shasum.digest('hex');
 	debug('generated SHA1 hash for "data:" URI: %o', hash);
 
 	// check if the cache is the same "data:" URI that was previously passed in.
-	if (cache && cache.hash == hash) {
+	if (cache && cache.hash === hash) {
 		debug('got matching cache SHA1 hash: %o', hash);
 		throw new NotModifiedError();
 	} else {
