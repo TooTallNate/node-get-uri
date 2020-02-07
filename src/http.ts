@@ -48,7 +48,7 @@ export default async function get(
 	if (cache && isFresh(cache) && typeof cache.statusCode === 'number') {
 		// check for a 3xx "redirect" status code on the previous cache
 		const type = (cache.statusCode / 100) | 0;
-		if (type == 3 && cache.headers.location) {
+		if (type === 3 && cache.headers.location) {
 			debug('cached redirect');
 			throw new Error('TODO: implement cached redirects!');
 		}
@@ -108,7 +108,7 @@ export default async function get(
 
 	// check for a 3xx "redirect" status code
 	let location = res.headers.location;
-	if (type == 3 && location) {
+	if (type === 3 && location) {
 		if (!opts.redirects) opts.redirects = [];
 		let redirects = opts.redirects;
 
@@ -138,11 +138,11 @@ export default async function get(
 	}
 
 	// if we didn't get a 2xx "success" status code, then create an Error object
-	if (type != 2) {
+	if (type !== 2) {
 		res.resume();
-		if (code == 304) {
+		if (code === 304) {
 			throw new NotModifiedError();
-		} else if (code == 404) {
+		} else if (code === 404) {
 			throw new NotFoundError();
 		}
 		// other HTTP-level error
@@ -183,8 +183,7 @@ function isFresh(cache: HttpIncomingMessage): boolean {
 			const name = subparts[0];
 			switch (name) {
 				case 'max-age':
-					const val = +subparts[1];
-					expires = (cache.date || 0) + val * 1000;
+					expires = (cache.date || 0) + parseInt(subparts[1], 10) * 1000;
 					fresh = Date.now() < expires;
 					if (fresh) {
 						debug(
@@ -203,6 +202,9 @@ function isFresh(cache: HttpIncomingMessage): boolean {
 						name
 					);
 					return false;
+				default:
+					// ignore unknown cache value
+					break;
 			}
 		}
 	} else if (expires) {

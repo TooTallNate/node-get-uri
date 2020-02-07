@@ -1,6 +1,6 @@
 import createDebug from 'debug';
 import { Readable } from 'stream';
-import { URL, UrlWithStringQuery, parse } from 'url';
+import { UrlWithStringQuery, parse } from 'url';
 
 // Built-in protocols
 import data from './data';
@@ -55,7 +55,7 @@ function getUri(
 		const parsed = parse(uri);
 
 		// Strip trailing `:`
-		const protocol = (parsed.protocol || '').replace(/\:$/, '');
+		const protocol = (parsed.protocol || '').replace(/:$/, '');
 		if (!protocol) {
 			reject(new TypeError(`URI does not contain a protocol: ${uri}`));
 			return;

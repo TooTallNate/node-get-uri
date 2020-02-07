@@ -67,7 +67,7 @@ export default async function get(
 		rs.stat = stat;
 		return rs;
 	} catch (err) {
-		if (err.code == 'ENOENT') {
+		if (err.code === 'ENOENT') {
 			throw new NotFoundError();
 		}
 		throw err;
@@ -76,5 +76,5 @@ export default async function get(
 
 // returns `true` if the `mtime` of the 2 stat objects are equal
 function isNotModified(prev: Stats, curr: Stats): boolean {
-	return +prev.mtime == +curr.mtime;
+	return +prev.mtime === +curr.mtime;
 }

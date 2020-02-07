@@ -65,7 +65,7 @@ export default async function get(
 		try {
 			lastModified = await new Promise((resolve, reject) => {
 				client.lastMod(filepath, (err, res) => {
-					err ? reject(err) : resolve(res);
+					return err ? reject(err) : resolve(res);
 				});
 			});
 		} catch (err) {
@@ -81,7 +81,7 @@ export default async function get(
 			const list = await new Promise<ListingElement[]>(
 				(resolve, reject) => {
 					client.list(dirname(filepath), (err, res) => {
-						err ? reject(err) : resolve(res);
+						return err ? reject(err) : resolve(res);
 					});
 				}
 			);
@@ -108,7 +108,7 @@ export default async function get(
 		const rs = (await new Promise<NodeJS.ReadableStream>(
 			(resolve, reject) => {
 				client.get(filepath, (err, res) => {
-					err ? reject(err) : resolve(res);
+					return err ? reject(err) : resolve(res);
 				});
 			}
 		)) as FTPReadable;
@@ -123,7 +123,7 @@ export default async function get(
 	// called when `lastModified` is set, and a "cache" stream was provided
 	function isNotModified(): boolean {
 		if (cache && cache.lastModified && lastModified) {
-			return +cache.lastModified == +lastModified;
+			return +cache.lastModified === +lastModified;
 		}
 		return false;
 	}
