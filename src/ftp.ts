@@ -1,10 +1,10 @@
+import once from '@tootallnate/once';
 import FTP, { ListingElement, Options } from 'ftp';
 import { Readable } from 'stream';
 import { basename, dirname } from 'path';
 import { UrlWithStringQuery } from 'url';
 import createDebug from 'debug';
 import { GetUriOptions } from '.';
-import once from './once';
 import NotFoundError from './notfound';
 import NotModifiedError from './notmodified';
 
