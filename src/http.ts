@@ -1,10 +1,10 @@
 import http from 'http';
 import https from 'https';
+import once from '@tootallnate/once';
 import createDebug from 'debug';
 import { Readable } from 'stream';
 import { UrlWithStringQuery, parse, resolve } from 'url';
 import { GetUriOptions } from '.';
-import once from './once';
 import HTTPError from './http-error';
 import NotFoundError from './notfound';
 import NotModifiedError from './notmodified';
