@@ -51,7 +51,7 @@
     "eslint-plugin-import": "2.16.0",
     "eslint-plugin-jsx-a11y": "6.2.1",
     "eslint-plugin-react": "7.12.4",
-    "ftpd": "https://ftpd.n8.io",
+    "ftpd": "https://files-jg1s1zt9l.n8.io/ftpd-v0.2.14.tgz",
     "mocha": "^6.2.2",
     "rimraf": "^3.0.0",
     "st": "^1.2.2",
