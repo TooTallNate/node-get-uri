@@ -33,7 +33,7 @@ function getUri(
 	opts: getUri.GetUriOptions,
 	fn: getUri.GetUriCallback
 ): void;
-function getUri(uri: string, opts: getUri.GetUriOptions): Promise<Readable>;
+function getUri(uri: string, opts?: getUri.GetUriOptions): Promise<Readable>;
 function getUri(
 	uri: string,
 	opts?: getUri.GetUriOptions | getUri.GetUriCallback,
