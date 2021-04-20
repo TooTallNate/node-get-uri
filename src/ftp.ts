@@ -27,7 +27,7 @@ export default async function get(
 	opts: FTPOptions
 ): Promise<Readable> {
 	const { cache } = opts;
-	const filepath = parsed.pathname;
+	const filepath = unescape(parsed.pathname || '')
 	let lastModified: Date | null = null;
 
 	if (!filepath) {
