@@ -94,7 +94,7 @@ export default async function get(
 	}
 
 	const req = mod.get(options);
-	const res = await once<HttpIncomingMessage>(req, 'response');
+	const [res]: [HttpIncomingMessage] = await once(req, 'response');
 	const code = res.statusCode || 0;
 
 	// assign a Date to this response for the "Cache-Control" delta calculation

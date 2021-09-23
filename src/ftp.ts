@@ -55,7 +55,6 @@ export default async function get(
 			opts.password = password;
 		}
 
-		// await cb(_ => client.connect(opts, _));
 		const readyPromise = once(client, 'ready');
 		client.connect(opts);
 		await readyPromise;
@@ -68,7 +67,7 @@ export default async function get(
 					return err ? reject(err) : resolve(res);
 				});
 			});
-		} catch (err) {
+		} catch (err: any) {
 			// handle the "file not found" error code
 			if (err.code === 550) {
 				throw new NotFoundError();
