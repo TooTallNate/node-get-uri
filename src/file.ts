@@ -66,7 +66,7 @@ export default async function get(
 		}) as FileReadable;
 		rs.stat = stat;
 		return rs;
-	} catch (err) {
+	} catch (err: any) {
 		if (err.code === 'ENOENT') {
 			throw new NotFoundError();
 		}
