@@ -8,14 +8,14 @@ describe('get-uri', () => {
 		it('should work for local files', async () => {
 			const actual = await readFile(__filename, 'utf8');
 			const uri = pathToFileURL(__filename);
-			const stream = await getUri(uri.href);
+			const stream = await getUri(uri);
 			const buf = await toBuffer(stream);
 			expect(buf.toString()).toEqual(actual);
 		});
 
 		it('should return ENOTFOUND for bad filenames', async () => {
 			const uri = pathToFileURL(`${__filename}does-not-exist`);
-			await expect(getUri(uri.href)).rejects.toHaveProperty(
+			await expect(getUri(uri)).rejects.toHaveProperty(
 				'code',
 				'ENOTFOUND'
 			);
@@ -23,8 +23,8 @@ describe('get-uri', () => {
 
 		it('should return ENOTMODIFIED for the same URI with `cache`', async () => {
 			const uri = pathToFileURL(__filename);
-			const cache = await getUri(uri.href);
-			await expect(getUri(uri.href, { cache })).rejects.toHaveProperty(
+			const cache = await getUri(uri);
+			await expect(getUri(uri, { cache })).rejects.toHaveProperty(
 				'code',
 				'ENOTMODIFIED'
 			);

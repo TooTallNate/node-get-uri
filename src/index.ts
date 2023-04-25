@@ -1,6 +1,5 @@
 import createDebug from 'debug';
 import { Readable } from 'stream';
-import { UrlWithStringQuery, parse } from 'url';
 
 // Built-in protocols
 import { data } from './data';
@@ -13,10 +12,7 @@ const debug = createDebug('get-uri');
 
 type Protocol<T> = T extends `${infer Protocol}:${infer _}` ? Protocol : never;
 
-export type GetUriProtocol<T> = (
-	parsed: UrlWithStringQuery,
-	opts?: T
-) => Promise<Readable>;
+export type GetUriProtocol<T> = (parsed: URL, opts?: T) => Promise<Readable>;
 
 export const protocols = {
 	data,
@@ -34,10 +30,10 @@ type ProtocolOpts<T> = {
 		: never;
 }[keyof Protocols];
 
-const VALID_PROTOCOLS = Object.keys(protocols);
+const VALID_PROTOCOLS = new Set(Object.keys(protocols));
 
 export function isValidProtocol(p: string): p is keyof Protocols {
-	return VALID_PROTOCOLS.includes(p);
+	return VALID_PROTOCOLS.has(p);
 }
 
 /**
@@ -56,7 +52,7 @@ export function isValidProtocol(p: string): p is keyof Protocols {
  * @api public
  */
 export async function getUri<Uri extends string>(
-	uri: Uri,
+	uri: Uri | URL,
 	opts?: ProtocolOpts<Uri>
 ): Promise<Readable> {
 	debug('getUri(%o)', uri);
@@ -65,14 +61,10 @@ export async function getUri<Uri extends string>(
 		throw new TypeError('Must pass in a URI to "getUri()"');
 	}
 
-	const parsed = parse(uri);
+	const url = typeof uri === 'string' ? new URL(uri) : uri;
 
 	// Strip trailing `:`
-	const protocol = (parsed.protocol || '').replace(/:$/, '');
-	if (!protocol) {
-		throw new TypeError(`URI does not contain a protocol: "${uri}"`);
-	}
-
+	const protocol = url.protocol.replace(/:$/, '');
 	if (!isValidProtocol(protocol)) {
 		throw new TypeError(
 			`Unsupported protocol "${protocol}" specified in URI: "${uri}"`
@@ -80,5 +72,5 @@ export async function getUri<Uri extends string>(
 	}
 
 	const getter = protocols[protocol];
-	return getter(parsed, opts as any);
+	return getter(url, opts as any);
 }

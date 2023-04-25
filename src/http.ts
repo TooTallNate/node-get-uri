@@ -3,7 +3,6 @@ import https from 'https';
 import once from '@tootallnate/once';
 import createDebug from 'debug';
 import { Readable } from 'stream';
-import { UrlWithStringQuery, parse, resolve } from 'url';
 import { GetUriProtocol } from '.';
 import HTTPError from './http-error';
 import NotFoundError from './notfound';
@@ -15,7 +14,7 @@ type HttpOrHttpsModule = typeof http_ | typeof https;
 
 export interface HttpReadableProps {
 	date?: number;
-	parsed?: UrlWithStringQuery;
+	parsed?: URL;
 	redirects?: HttpReadable[];
 }
 
@@ -35,10 +34,10 @@ export interface HttpOptions extends https.RequestOptions {
 /**
  * Returns a Readable stream from an "http:" URI.
  */
-export const http: GetUriProtocol<HttpOptions> = async (parsed, opts = {}) => {
-	debug('GET %o', parsed.href);
+export const http: GetUriProtocol<HttpOptions> = async (url, opts = {}) => {
+	debug('GET %o', url.href);
 
-	const cache = getCache(parsed, opts.cache);
+	const cache = getCache(url, opts.cache);
 
 	// first check the previous Expires and/or Cache-Control headers
 	// of a previous response if a `cache` was provided
@@ -69,7 +68,7 @@ export const http: GetUriProtocol<HttpOptions> = async (parsed, opts = {}) => {
 		debug('using `http` core module');
 	}
 
-	const options = { ...opts, ...parsed };
+	const options = { ...opts };
 
 	// add "cache validation" headers if a `cache` was provided
 	if (cache) {
@@ -90,13 +89,13 @@ export const http: GetUriProtocol<HttpOptions> = async (parsed, opts = {}) => {
 		}
 	}
 
-	const req = mod.get(options);
+	const req = mod.get(url, options);
 	const [res]: [HttpIncomingMessage] = await once(req, 'response');
 	const code = res.statusCode || 0;
 
 	// assign a Date to this response for the "Cache-Control" delta calculation
 	res.date = Date.now();
-	res.parsed = parsed;
+	res.parsed = url;
 
 	debug('got %o response status code', code);
 
@@ -118,19 +117,18 @@ export const http: GetUriProtocol<HttpOptions> = async (parsed, opts = {}) => {
 			// hang on to this Response object for the "redirects" Array
 			redirects.push(res);
 
-			let newUri = resolve(parsed.href, location);
-			debug('resolved redirect URL: %o', newUri);
+			let newUri = new URL(location, url.href);
+			debug('resolved redirect URL: %o', newUri.href);
 
 			let left = maxRedirects - redirects.length;
 			debug('%o more redirects allowed after this one', left);
 
 			// check if redirecting to a different protocol
-			let parsedUrl = parse(newUri);
-			if (parsedUrl.protocol !== parsed.protocol) {
-				opts.http = parsedUrl.protocol === 'https:' ? https : undefined;
+			if (newUri.protocol !== url.protocol) {
+				opts.http = newUri.protocol === 'https:' ? https : undefined;
 			}
 
-			return http(parsedUrl, opts);
+			return http(newUri, opts);
 		}
 	}
 
@@ -225,17 +223,14 @@ function isFresh(cache: HttpIncomingMessage): boolean {
  * @api private
  */
 
-function getCache(
-	parsed: UrlWithStringQuery,
-	cache?: HttpReadable
-): HttpIncomingMessage | null {
+function getCache(url: URL, cache?: HttpReadable): HttpIncomingMessage | null {
 	if (cache) {
-		if (cache.parsed && cache.parsed.href === parsed.href) {
+		if (cache.parsed && cache.parsed.href === url.href) {
 			return cache as HttpIncomingMessage;
 		}
 		if (cache.redirects) {
 			for (let i = 0; i < cache.redirects.length; i++) {
-				const c = getCache(parsed, cache.redirects[i]);
+				const c = getCache(url, cache.redirects[i]);
 				if (c) {
 					return c as HttpIncomingMessage;
 				}

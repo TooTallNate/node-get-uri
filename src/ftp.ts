@@ -21,9 +21,9 @@ export interface FTPOptions extends Options {
 /**
  * Returns a Readable stream from an "ftp:" URI.
  */
-export const ftp: GetUriProtocol<FTPOptions> = async (parsed, opts = {}) => {
+export const ftp: GetUriProtocol<FTPOptions> = async (url, opts = {}) => {
 	const { cache } = opts;
-	const filepath = parsed.pathname;
+	const filepath = url.pathname;
 	let lastModified: Date | null = null;
 
 	if (!filepath) {
@@ -41,14 +41,15 @@ export const ftp: GetUriProtocol<FTPOptions> = async (parsed, opts = {}) => {
 	}
 
 	try {
-		opts.host = parsed.hostname || parsed.host || 'localhost';
-		opts.port = parseInt(parsed.port || '0', 10) || 21;
+		opts.host = url.hostname || url.host || 'localhost';
+		opts.port = parseInt(url.port || '0', 10) || 21;
 		opts.debug = debug;
 
-		if (parsed.auth) {
-			const [user, password] = parsed.auth.split(':');
-			opts.user = user;
-			opts.password = password;
+		if (url.username) {
+			opts.user = url.username;
+		}
+		if (url.password) {
+			opts.password = url.password;
 		}
 
 		const readyPromise = once(client, 'ready');

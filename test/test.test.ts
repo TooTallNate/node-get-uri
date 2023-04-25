@@ -12,9 +12,7 @@ describe('get-uri', () => {
 	});
 
 	it('should throw a TypeError when no protocol is specified', async () => {
-		await expect(getUri('://bad')).rejects.toThrow(
-			'URI does not contain a protocol: "://bad"'
-		);
+		await expect(getUri('://bad')).rejects.toThrow('Invalid URL');
 	});
 
 	it('should throw a TypeError when an unsupported protocol is specified', async () => {
