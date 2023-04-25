@@ -10,7 +10,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
-    "test": "mocha --reporter spec",
+    "test": "jest",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -40,12 +40,15 @@
     "@types/debug": "4",
     "@types/fs-extra": "^8.0.1",
     "@types/ftp": "^0.3.30",
-    "@types/node": "^12.12.11",
+    "@types/ftpd": "^0.2.35",
+    "@types/jest": "^29.5.1",
+    "@types/node": "^14.18.42",
+    "async-listen": "^2.1.0",
     "ftpd": "https://files-jg1s1zt9l.n8.io/ftpd-v0.2.14.tgz",
-    "mocha": "^6.2.2",
+    "jest": "^29.5.0",
     "rimraf": "^3.0.0",
     "st": "^1.2.2",
-    "stream-to-array": "2",
+    "ts-jest": "^29.1.0",
     "typescript": "^4.4.3"
   },
   "dependencies": {
@@ -57,6 +60,20 @@
     "ftp": "^0.3.10"
   },
   "engines": {
-    "node": ">= 8"
+    "node": ">= 14"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false,
+        "isolatedModules": true
+      }
+    },
+    "verbose": false,
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/test/**/*.test.ts"
+    ]
   }
 }

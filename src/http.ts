@@ -1,17 +1,17 @@
-import http from 'http';
+import http_ from 'http';
 import https from 'https';
 import once from '@tootallnate/once';
 import createDebug from 'debug';
 import { Readable } from 'stream';
 import { UrlWithStringQuery, parse, resolve } from 'url';
-import { GetUriOptions } from '.';
+import { GetUriProtocol } from '.';
 import HTTPError from './http-error';
 import NotFoundError from './notfound';
 import NotModifiedError from './notmodified';
 
 const debug = createDebug('get-uri:http');
 
-type HttpOrHttpsModule = typeof http | typeof https;
+type HttpOrHttpsModule = typeof http_ | typeof https;
 
 export interface HttpReadableProps {
 	date?: number;
@@ -22,10 +22,10 @@ export interface HttpReadableProps {
 export interface HttpReadable extends Readable, HttpReadableProps {}
 
 export interface HttpIncomingMessage
-	extends http.IncomingMessage,
+	extends http_.IncomingMessage,
 		HttpReadableProps {}
 
-export interface HttpOptions extends GetUriOptions, https.RequestOptions {
+export interface HttpOptions extends https.RequestOptions {
 	cache?: HttpReadable;
 	http?: HttpOrHttpsModule;
 	redirects?: HttpReadable[];
@@ -35,10 +35,7 @@ export interface HttpOptions extends GetUriOptions, https.RequestOptions {
 /**
  * Returns a Readable stream from an "http:" URI.
  */
-export default async function get(
-	parsed: UrlWithStringQuery,
-	opts: HttpOptions
-): Promise<Readable> {
+export const http: GetUriProtocol<HttpOptions> = async (parsed, opts = {}) => {
 	debug('GET %o', parsed.href);
 
 	const cache = getCache(parsed, opts.cache);
@@ -68,7 +65,7 @@ export default async function get(
 		mod = opts.http;
 		debug('using secure `https` core module');
 	} else {
-		mod = http;
+		mod = http_;
 		debug('using `http` core module');
 	}
 
@@ -133,7 +130,7 @@ export default async function get(
 				opts.http = parsedUrl.protocol === 'https:' ? https : undefined;
 			}
 
-			return get(parsedUrl, opts);
+			return http(parsedUrl, opts);
 		}
 	}
 
@@ -156,7 +153,7 @@ export default async function get(
 	}
 
 	return res;
-}
+};
 
 /**
  * Returns `true` if the provided cache's "freshness" is valid. That is, either
@@ -183,7 +180,8 @@ function isFresh(cache: HttpIncomingMessage): boolean {
 			const name = subparts[0];
 			switch (name) {
 				case 'max-age':
-					expires = (cache.date || 0) + parseInt(subparts[1], 10) * 1000;
+					expires =
+						(cache.date || 0) + parseInt(subparts[1], 10) * 1000;
 					fresh = Date.now() < expires;
 					if (fresh) {
 						debug(

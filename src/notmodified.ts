@@ -12,6 +12,5 @@ export default class NotModifiedError extends Error {
 			message ||
 				'Source has not been modified since the provied "cache", re-use previous results'
 		);
-		Object.setPrototypeOf(this, new.target.prototype);
 	}
 }

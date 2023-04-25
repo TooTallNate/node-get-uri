@@ -2,19 +2,18 @@ import once from '@tootallnate/once';
 import FTP, { ListingElement, Options } from 'ftp';
 import { Readable } from 'stream';
 import { basename, dirname } from 'path';
-import { UrlWithStringQuery } from 'url';
 import createDebug from 'debug';
-import { GetUriOptions } from '.';
 import NotFoundError from './notfound';
 import NotModifiedError from './notmodified';
+import { GetUriProtocol } from '.';
 
 const debug = createDebug('get-uri:ftp');
 
-interface FTPReadable extends Readable {
+export interface FTPReadable extends Readable {
 	lastModified?: Date;
 }
 
-interface FTPOptions extends GetUriOptions, Options {
+export interface FTPOptions extends Options {
 	cache?: FTPReadable;
 	debug?: (s: string) => void;
 }
@@ -22,10 +21,7 @@ interface FTPOptions extends GetUriOptions, Options {
 /**
  * Returns a Readable stream from an "ftp:" URI.
  */
-export default async function get(
-	parsed: UrlWithStringQuery,
-	opts: FTPOptions
-): Promise<Readable> {
+export const ftp: GetUriProtocol<FTPOptions> = async (parsed, opts = {}) => {
 	const { cache } = opts;
 	const filepath = parsed.pathname;
 	let lastModified: Date | null = null;
@@ -87,7 +83,7 @@ export default async function get(
 
 			// attempt to find the "entry" with a matching "name"
 			const name = basename(filepath);
-			const entry = list.find(e => e.name === name);
+			const entry = list.find((e) => e.name === name);
 			if (entry) {
 				lastModified = entry.date;
 			}
@@ -126,4 +122,4 @@ export default async function get(
 		}
 		return false;
 	}
-}
+};
