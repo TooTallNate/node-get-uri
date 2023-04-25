@@ -55,7 +55,6 @@
     "@tootallnate/once": "2",
     "data-uri-to-buffer": "3",
     "debug": "4",
-    "file-uri-to-path": "2",
     "fs-extra": "^8.1.0",
     "ftp": "^0.3.10"
   },
