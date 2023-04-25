@@ -32,7 +32,7 @@ describe('get-uri', () => {
 			const actual = await readFile(__filename, 'utf8');
 			const stream = await getUri(
 				`https://127.0.0.1:${port}/${path.basename(__filename)}`,
-				{ headers: { connection: "close" }, rejectUnauthorized: false }
+				{ headers: { connection: 'close' }, rejectUnauthorized: false }
 			);
 			const buf = await toBuffer(stream);
 			expect(buf.toString()).toEqual(actual);
@@ -40,22 +40,28 @@ describe('get-uri', () => {
 
 		it('should return ENOTFOUND for bad filenames', async () => {
 			await expect(
-				getUri(`https://127.0.0.1:${port}/does-not-exist`, { headers: { connection: "close" },  rejectUnauthorized: false })
+				getUri(`https://127.0.0.1:${port}/does-not-exist`, {
+					headers: { connection: 'close' },
+					rejectUnauthorized: false,
+				})
 			).rejects.toHaveProperty('code', 'ENOTFOUND');
 		});
 
 		it('should return ENOTMODIFIED for the same URI with `cache`', async () => {
-			const cache = await getUri(`https://127.0.0.1:${port}/${path.basename(__filename)}`, { headers: { connection: "close" }, rejectUnauthorized: false });
+			const cache = await getUri(
+				`https://127.0.0.1:${port}/${path.basename(__filename)}`,
+				{ headers: { connection: 'close' }, rejectUnauthorized: false }
+			);
 			await expect(
 				getUri(
 					`https://127.0.0.1:${port}/${path.basename(__filename)}`,
 					{
 						cache,
-						headers: { connection: "close" },
+						headers: { connection: 'close' },
 						rejectUnauthorized: false,
 					}
 				)
-			).rejects.toHaveProperty("code", "ENOTMODIFIED");
+			).rejects.toHaveProperty('code', 'ENOTMODIFIED');
 		});
 	});
 });

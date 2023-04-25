@@ -1,5 +1,5 @@
 import https_ from 'https';
-import { http, type HttpOptions } from './http';
+import { http, HttpOptions } from './http';
 import type { GetUriProtocol } from '.';
 
 /**

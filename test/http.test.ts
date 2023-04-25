@@ -3,7 +3,7 @@ import st from 'st';
 import path from 'path';
 import http from 'http';
 import { listen } from 'async-listen';
-import { readFile } from "fs-extra";
+import { readFile } from 'fs-extra';
 import { getUri } from '../src';
 import { toBuffer } from './util';
 
@@ -26,7 +26,9 @@ describe('get-uri', () => {
 
 		it('should work for HTTP endpoints', async () => {
 			const actual = await readFile(__filename, 'utf8');
-			const stream = await getUri(`http://127.0.0.1:${port}/${path.basename(__filename)}`);
+			const stream = await getUri(
+				`http://127.0.0.1:${port}/${path.basename(__filename)}`
+			);
 			const buf = await toBuffer(stream);
 			expect(buf.toString()).toEqual(actual);
 		});
@@ -38,11 +40,16 @@ describe('get-uri', () => {
 		});
 
 		it('should return ENOTMODIFIED for the same URI with `cache`', async () => {
-			const cache = await getUri(`http://127.0.0.1:${port}/${path.basename(__filename)}`);
+			const cache = await getUri(
+				`http://127.0.0.1:${port}/${path.basename(__filename)}`
+			);
 			await expect(
-				getUri(`http://127.0.0.1:${port}/${path.basename(__filename)}`, {
-					cache,
-				})
+				getUri(
+					`http://127.0.0.1:${port}/${path.basename(__filename)}`,
+					{
+						cache,
+					}
+				)
 			).rejects.toHaveProperty('code', 'ENOTMODIFIED');
 		});
 	});
