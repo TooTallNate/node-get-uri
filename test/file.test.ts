@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { readFile } from 'fs-extra';
 import { getUri } from '../src';
@@ -8,6 +9,15 @@ describe('get-uri', () => {
 		it('should work for local files', async () => {
 			const actual = await readFile(__filename, 'utf8');
 			const uri = pathToFileURL(__filename);
+			const stream = await getUri(uri);
+			const buf = await toBuffer(stream);
+			expect(buf.toString()).toEqual(actual);
+		});
+
+		it('should work for files with special characters in name', async () => {
+			const file = join(__dirname, 'file with special chars!');
+			const actual = await readFile(file, 'utf8');
+			const uri = pathToFileURL(file);
 			const stream = await getUri(uri);
 			const buf = await toBuffer(stream);
 			expect(buf.toString()).toEqual(actual);

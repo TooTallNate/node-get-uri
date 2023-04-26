@@ -1,4 +1,4 @@
-import path from 'path';
+import { basename, join } from 'path';
 import { FtpServer } from 'ftpd';
 import { getUri } from '../src';
 import { readFile } from 'fs-extra';
@@ -51,8 +51,18 @@ describe('get-uri', () => {
 		it('should work for ftp endpoints', async () => {
 			const actual = await readFile(__filename, 'utf8');
 			const stream = await getUri(
-				`ftp://127.0.0.1:${port}/${path.basename(__filename)}`
+				`ftp://127.0.0.1:${port}/${basename(__filename)}`
 			);
+			const buf = await toBuffer(stream);
+			expect(buf.toString()).toEqual(actual);
+		});
+
+		it('should work for files with special characters in name', async () => {
+			const file = join(__dirname, 'file with special chars!');
+			const actual = await readFile(file, 'utf8');
+			const url = new URL(`ftp://127.0.0.1:${port}`);
+			url.pathname = basename(file);
+			const stream = await getUri(url);
 			const buf = await toBuffer(stream);
 			expect(buf.toString()).toEqual(actual);
 		});
@@ -65,10 +75,10 @@ describe('get-uri', () => {
 
 		it('should return ENOTMODIFIED for the same URI with `cache`', async () => {
 			const cache = await getUri(
-				`ftp://127.0.0.1:${port}/${path.basename(__filename)}`
+				`ftp://127.0.0.1:${port}/${basename(__filename)}`
 			);
 			await expect(
-				getUri(`ftp://127.0.0.1:${port}/${path.basename(__filename)}`, {
+				getUri(`ftp://127.0.0.1:${port}/${basename(__filename)}`, {
 					cache,
 				})
 			).rejects.toHaveProperty('code', 'ENOTMODIFIED');

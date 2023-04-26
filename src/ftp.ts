@@ -21,7 +21,7 @@ export interface FTPOptions extends AccessOptions {
  */
 export const ftp: GetUriProtocol<FTPOptions> = async (url, opts = {}) => {
 	const { cache } = opts;
-	const filepath = url.pathname;
+	const filepath = decodeURIComponent(url.pathname);
 	let lastModified: Date | undefined;
 
 	if (!filepath) {
