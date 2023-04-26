@@ -39,7 +39,6 @@
   "devDependencies": {
     "@types/debug": "4",
     "@types/fs-extra": "^8.0.1",
-    "@types/ftp": "^0.3.30",
     "@types/ftpd": "^0.2.35",
     "@types/jest": "^29.5.1",
     "@types/node": "^14.18.42",
@@ -53,10 +52,10 @@
   },
   "dependencies": {
     "@tootallnate/once": "2",
+    "basic-ftp": "^5.0.2",
     "data-uri-to-buffer": "3",
     "debug": "4",
-    "fs-extra": "^8.1.0",
-    "ftp": "^0.3.10"
+    "fs-extra": "^8.1.0"
   },
   "engines": {
     "node": ">= 14"
