@@ -1,9 +1,8 @@
 import createDebug from 'debug';
 import { Readable } from 'stream';
 import { createHash } from 'crypto';
-import { UrlWithStringQuery } from 'url';
 import dataUriToBuffer from 'data-uri-to-buffer';
-import { GetUriOptions } from '.';
+import { GetUriProtocol } from './';
 import NotModifiedError from './notmodified';
 
 const debug = createDebug('get-uri:data');
@@ -19,17 +18,17 @@ class DataReadable extends Readable {
 	}
 }
 
-interface DataOptions extends GetUriOptions {
+export interface DataOptions {
 	cache?: DataReadable;
 }
 
 /**
  * Returns a Readable stream from a "data:" URI.
  */
-export default async function get(
-	{ href: uri }: UrlWithStringQuery,
-	{ cache }: DataOptions
-): Promise<Readable> {
+export const data: GetUriProtocol<DataOptions> = async (
+	{ href: uri },
+	{ cache } = {}
+) => {
 	// need to create a SHA1 hash of the URI string, for cacheability checks
 	// in future `getUri()` calls with the same data URI passed in.
 	const shasum = createHash('sha1');
@@ -38,7 +37,7 @@ export default async function get(
 	debug('generated SHA1 hash for "data:" URI: %o', hash);
 
 	// check if the cache is the same "data:" URI that was previously passed in.
-	if (cache && cache.hash === hash) {
+	if (cache?.hash === hash) {
 		debug('got matching cache SHA1 hash: %o', hash);
 		throw new NotModifiedError();
 	} else {
@@ -46,4 +45,4 @@ export default async function get(
 		const buf = dataUriToBuffer(uri);
 		return new DataReadable(hash, buf);
 	}
-}
+};

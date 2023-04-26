@@ -9,10 +9,7 @@ export default class HTTPError extends Error {
 
 	constructor(statusCode: number, message = STATUS_CODES[statusCode]) {
 		super(message);
-		Object.setPrototypeOf(this, new.target.prototype);
 		this.statusCode = statusCode;
-		this.code = `E${String(message)
-			.toUpperCase()
-			.replace(/\s+/g, '')}`;
+		this.code = `E${String(message).toUpperCase().replace(/\s+/g, '')}`;
 	}
 }

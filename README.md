@@ -31,14 +31,12 @@ Example
 
 To simply get a `stream.Readable` instance from a `file:` URI, try something like:
 
-``` js
-var getUri = require('get-uri');
+```ts
+import { getUri } from 'get-uri';
 
 // `file:` maps to a `fs.ReadStream` instance…
-getUri('file:///Users/nrajlich/wat.json', function (err, rs) {
-  if (err) throw err;
-  rs.pipe(process.stdout);
-});
+const stream = await getUri('file:///Users/nrajlich/wat.json');
+stream.pipe(process.stdout);
 ```
 
 
@@ -50,19 +48,17 @@ destination server, then a `NotFoundError` will be returned. The `code` of the
 error instance is set to `"ENOTFOUND"`, so you can special-case that in your code
 to detect when a bad filename is requested:
 
-``` js
-getUri('http://example.com/resource.json', function (err, rs) {
-  if (err) {
-    if ('ENOTFOUND' == err.code) {
-      // bad file path requested
-    } else {
-      // something else bad happened...
-      throw err;
-    }
+```ts
+try {
+  await getUri('http://example.com/resource.json');
+} catch (err) {
+  if (err.code === 'ENOTFOUND') {
+    // bad file path requested
+  } else {
+    // something else bad happened...
+    throw err;
   }
-
-  // your app code…
-});
+}
 ```
 
 
@@ -83,47 +79,40 @@ When the `"ENOTMODIFIED"` error occurs, then you can safely re-use the
 results from the previous `getUri()` call for that same URI:
 
 ``` js
-// maps to a `fs.ReadStream` instance
-getUri('http://example.com/resource.json', function (err, rs) {
-  if (err) throw err;
+// First time fetches for real
+const stream = await getUri('http://example.com/resource.json');
 
+try {
   // … some time later, if you need to get this same URI again, pass in the
   // previous `stream.Readable` instance as `cache` option to potentially
-  // receive an "ENOTMODIFIED" response:
-  var opts = { cache: rs };
-  getUri('http://example.com/resource.json', opts, function (err, rs2) {
-    if (err) {
-      if ('ENOTFOUND' == err.code) {
-        // bad file path requested
-      } else if ('ENOTMODIFIED' == err.code) {
-        // source file has not been modified since last time it was requested,
-        // so `rs2` is undefined and you are expected to re-use results from
-        // a previous call to `getUri()`
-      } else {
-        // something else bad happened...
-        throw err;
-      }
-    }
-  });
-});
+  // have an "ENOTMODIFIED" error thrown:
+  await getUri('http://example.com/resource.json', { cache: stream });
+} catch (err) {
+  if (err.code === 'ENOTMODIFIED') {
+    // source file has not been modified since last time it was requested,
+    // so you are expected to re-use results from a previous call to `getUri()`
+  } else {
+    // something else bad happened...
+    throw err;
+  }
+}
 ```
 
 
 API
 ---
 
-### getUri(String uri[, Object options,] Function callback)
+### getUri(uri: string | URL, options?: Object]): Promise<Readable>
 
-A `uri` String is required. An optional `options` object may be passed in:
+A `uri` is required. An optional `options` object may be passed in:
 
- - `cache` - A `stream.Readable` instance from a previous call to `getUri()` with the same URI. If this option is passed in, and the destination endpoint has not been modified, then an `ENOTMODIFIED` error is returned
+ - `cache` - A `stream.Readable` instance from a previous call to `getUri()` with the same URI. If this option is passed in, and the destination endpoint has not been modified, then an `ENOTMODIFIED` error is thrown
 
 Any other options passed in to the `options` object will be passed through
 to the low-level connection creation functions (`http.get()`, `ftp.connect()`,
 etc).
 
-Invokes the given `callback` function with a `stream.Readable` instance to
-read the resource at the given `uri`.
+Returns a `stream.Readable` instance to read the resource at the given `uri`.
 
 License
 -------

@@ -10,6 +10,5 @@ export default class NotFoundError extends Error {
 
 	constructor(message?: string) {
 		super(message || 'File does not exist at the specified endpoint');
-		Object.setPrototypeOf(this, new.target.prototype);
 	}
 }
